@@ -1,0 +1,105 @@
+# ============================================================
+# GymFuel — .gitignore
+# MERN + TypeScript + pnpm Workspaces + Docker + Vite
+# ============================================================
+
+# ── Dependencies ────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+.pnp
+.pnp.js
+
+# ── Build Outputs ───────────────────────────────────────────
+dist/
+build/
+out/
+.output/
+.vite/
+*.tsbuildinfo
+
+# ── TypeScript ──────────────────────────────────────────────
+*.js.map
+*.d.ts.map
+
+# ── Environment Variables ───────────────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+# Keep the example template
+!.env.example
+
+# ── Logs ────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── Testing & Coverage ──────────────────────────────────────
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
+*.snap
+
+# ── OS Files ────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Editor / IDE ────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# ── Docker ──────────────────────────────────────────────────
+# Keep Dockerfiles and compose files tracked
+# Ignore local override files
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ── Nginx ───────────────────────────────────────────────────
+# Keep nginx configs tracked
+# Ignore generated ssl certs
+nginx/certs/
+nginx/ssl/
+
+# ── Caching ─────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.turbo/
+
+# ── Vite / PWA ──────────────────────────────────────────────
+apps/*/dist/
+apps/*/.vite/
+apps/user/public/sw.js
+apps/user/public/workbox-*.js
+apps/user/public/sw.js.map
+
+# ── pnpm ────────────────────────────────────────────────────
+.pnpm-debug.log
+
+# ── Misc ────────────────────────────────────────────────────
+*.local
+*.tgz
+tmp/
+temp/
