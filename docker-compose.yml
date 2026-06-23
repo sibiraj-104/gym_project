@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  gymfuel-mongo:
+    image: mongo:8.0
+    container_name: gymfuel-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  gymfuel-redis:
+    image: redis:7-alpine
+    container_name: gymfuel-redis
+    ports:
+      - "6379:6379"
+
+  gymfuel-api:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: gymfuel-api
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://gymfuel-mongo:27017/gymfuel
+      - REDIS_URI=redis://gymfuel-redis:6379
+      - NODE_ENV=development
+    depends_on:
+      - gymfuel-mongo
+      - gymfuel-redis
+
+  gymfuel-user:
+    build:
+      context: .
+      dockerfile: docker/user.Dockerfile
+    container_name: gymfuel-user
+    ports:
+      - "5173:80"
+
+  gymfuel-admin:
+    build:
+      context: .
+      dockerfile: docker/admin.Dockerfile
+    container_name: gymfuel-admin
+    ports:
+      - "5174:80"
+
+  gymfuel-landing:
+    build:
+      context: .
+      dockerfile: docker/landing.Dockerfile
+    container_name: gymfuel-landing
+    ports:
+      - "5175:80"
+
+volumes:
+  mongo-data:
