@@ -114,7 +114,7 @@ GymFuel is a full-stack web application built on the **MERN stack** with a **sin
 
 - **Framework:** Express `5.2.x` (TypeScript)
 - **Runtime:** Node.js `24.x LTS`
-- **Language:** TypeScript `5.x` (strict mode)
+- **Language:** TypeScript 6.0 (strict mode)
 - **Access:** `api.gymfuel.com`
 
 ### API Route Structure
@@ -222,7 +222,7 @@ food_items {
 |---------|---------------|---------|
 | **React** | `19.2.7` | Core UI framework |
 | **React DOM** | `19.2.7` | React DOM renderer |
-| **TypeScript** | `5.x` | Type-safe development |
+| **TypeScript** | 6.0 | Type-safe development |
 | **Vite** | `8.0.x` | Build tool (Rolldown-powered) |
 | **React Router** | `8.0.x` | Client-side routing |
 | **Zustand** | `5.x` | Global state management |
@@ -246,7 +246,7 @@ food_items {
 | Package | Stable Version | Purpose |
 |---------|---------------|---------|
 | **Node.js** | `24.x LTS` | Runtime environment |
-| **TypeScript** | `5.x` | Type-safe backend |
+| **TypeScript** | 6.0 | Type-safe backend |
 | **tsx** | `4.x` | TypeScript execution (dev) |
 | **Express** | `5.2.x` | Web framework |
 | **Mongoose** | `9.7.x` | MongoDB ODM |
