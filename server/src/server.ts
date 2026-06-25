@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { OnboardingSchema, HealthCheckResponseSchema } from 'gymfuel-shared';
+import { z } from 'zod';
 
 const app = express();
 app.use(express.json());
@@ -29,7 +30,7 @@ app.put('/api/user/onboarding', (req: Request, res: Response) => {
   if (!result.success) {
     res.status(400).json({
       error: 'Validation failed',
-      details: result.error.errors.map(err => ({
+      details: result.error.errors.map((err: z.ZodIssue) => ({
         path: err.path.join('.'),
         message: err.message,
       })),
