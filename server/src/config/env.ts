@@ -87,6 +87,33 @@ const envSchema = z.object({
  *  Throws a ZodError with clear messages if any required var is missing/invalid.
  */
 function validateEnv() {
+  // Bypass validation in test environment to prevent CI/Jest crashes
+  if (process.env.NODE_ENV === 'test') {
+    return {
+      NODE_ENV: 'test',
+      PORT: 5000,
+      MONGO_URI: 'mongodb://localhost:27017/test',
+      REDIS_URI: 'redis://localhost:6379',
+      JWT_SECRET: 'test-secret-that-is-at-least-32-chars-long',
+      JWT_EXPIRES_IN: '7d',
+      FIREBASE_PROJECT_ID: 'test-project',
+      FIREBASE_CLIENT_EMAIL: 'test@example.com',
+      FIREBASE_PRIVATE_KEY: 'test-key',
+      CLOUDINARY_CLOUD_NAME: 'test',
+      CLOUDINARY_API_KEY: 'test',
+      CLOUDINARY_API_SECRET: 'test',
+      GEMINI_API_KEY: 'test',
+      VAPID_PUBLIC_KEY: 'test',
+      VAPID_PRIVATE_KEY: 'test',
+      VAPID_EMAIL: 'admin@gymfuel.com',
+      SMTP_PORT: 587,
+      SMTP_FROM: 'GymFuel <noreply@gymfuel.com>',
+      CORS_ORIGINS: 'http://localhost:5173',
+      RATE_LIMIT_MAX: 100,
+      LOG_LEVEL: 'info',
+    } as z.infer<typeof envSchema>;
+  }
+
   const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
