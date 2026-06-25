@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+dist
+build
+coverage
+.git
+.github
+.vscode
+*.log
+.env
+.env.*
+!.env.example
+docker-compose*.yml
+docs/
+logs/
+tests/
