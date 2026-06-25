@@ -1,8 +1,25 @@
 import express, { Request, Response } from 'express';
-import { OnboardingSchema, HealthCheckResponseSchema } from 'gymfuel-shared';
+import cors from 'cors';
+import helmet from 'helmet';
+import { HealthCheckResponseSchema, onboardingSchema } from 'gymfuel-shared';
+import { z } from 'zod';
+import { env } from './config/env';
+import { logger } from './config/logger';
+import { connectDatabase, registerShutdownHandlers } from './config/db';
+import { requestLogger, requestId } from './middleware/requestLogger';
+import { errorHandler, Errors } from './middleware/errorHandler';
+import { notFoundHandler } from './middleware/notFoundHandler';
 
 const app = express();
-app.use(express.json());
+
+// ── Global Middlewares ──────────────────────────────────────
+app.use(helmet()); // Security headers
+app.use(cors({ origin: env.CORS_ORIGINS, credentials: true })); // CORS
+app.use(express.json()); // JSON parsing
+app.use(requestId); // Inject unique Request ID
+app.use(requestLogger); // HTTP request logging
+
+// ── Routes ──────────────────────────────────────────────────
 
 // 🟢 Health check endpoint
 app.get('/api/system/health', (_req: Request, res: Response) => {
@@ -15,7 +32,9 @@ app.get('/api/system/health', (_req: Request, res: Response) => {
   // Validate using shared schema
   const parsed = HealthCheckResponseSchema.safeParse(payload);
   if (!parsed.success) {
-    res.status(500).json({ error: 'Internal validation failed', details: parsed.error });
+    res
+      .status(500)
+      .json({ error: 'Internal validation failed', details: parsed.error });
     return;
   }
 
@@ -24,12 +43,12 @@ app.get('/api/system/health', (_req: Request, res: Response) => {
 
 // 🚀 Sample onboarding validation endpoint (Milestone 2 alignment)
 app.put('/api/user/onboarding', (req: Request, res: Response) => {
-  const result = OnboardingSchema.safeParse(req.body);
+  const result = onboardingSchema.safeParse(req.body);
 
   if (!result.success) {
     res.status(400).json({
       error: 'Validation failed',
-      details: result.error.errors.map(err => ({
+      details: result.error.errors.map((err: z.ZodIssue) => ({
         path: err.path.join('.'),
         message: err.message,
       })),
@@ -43,11 +62,33 @@ app.put('/api/user/onboarding', (req: Request, res: Response) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// 🧪 Test route to trigger custom error
+app.get('/api/system/error', () => {
+  throw Errors.badRequest('This is a test error!');
+});
 
-if (require.main === module) {
+// ── Error Handling ──────────────────────────────────────────
+app.use(notFoundHandler); // Catch 404s
+app.use(errorHandler); // Global error handler
+
+// ── Server Startup ──────────────────────────────────────────
+async function startServer() {
+  // Connect to Database
+  await connectDatabase();
+  registerShutdownHandlers();
+
+  const PORT = env.PORT;
+
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`🚀 Server running on port ${PORT} in ${env.NODE_ENV} mode`);
+  });
+}
+
+// Start server if run directly
+if (require.main === module) {
+  startServer().catch((err) => {
+    logger.error('Failed to start server:', err);
+    process.exit(1);
   });
 }
 
