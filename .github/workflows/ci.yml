@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint:
@@ -19,6 +19,7 @@ jobs:
           node-version: 24
           cache: 'pnpm'
       - run: pnpm install
+      - run: pnpm --filter gymfuel-shared run build
       - run: pnpm run lint:all
 
   typecheck:

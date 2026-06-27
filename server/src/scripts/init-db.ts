@@ -159,7 +159,7 @@ async function createIndexes(): Promise<void> {
 
 createIndexes()
   .then(() => process.exit(0))
-  .catch((err) => {
+  .catch((err: Error) => {
     console.error('\n❌ Index creation failed:', err.message);
     process.exit(1);
   });
