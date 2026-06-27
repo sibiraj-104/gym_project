@@ -2,7 +2,11 @@ name: CD Deploy Staging
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  packages: write
+  contents: read
 
 jobs:
   build-and-push:
@@ -20,8 +24,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: sibiraj-104
-          password: ${{ secrets.GHCR_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Backend API
         uses: docker/build-push-action@v5
