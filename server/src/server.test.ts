@@ -16,12 +16,12 @@ describe('Server Integration Tests', () => {
       age: 25,
       weight: 75,
       height: 180,
+      gender: 'male',
+      activityLevel: 'moderate',
       goal: 'build_muscle',
     };
 
-    const res = await request(app)
-      .put('/api/user/onboarding')
-      .send(payload);
+    const res = await request(app).put('/api/user/onboarding').send(payload);
 
     expect(res.status).toBe(200);
     expect(res.body.message).toBe('Onboarding completed successfully');
@@ -37,12 +37,10 @@ describe('Server Integration Tests', () => {
       goal: 'invalid_goal', // invalid enum
     };
 
-    const res = await request(app)
-      .put('/api/user/onboarding')
-      .send(payload);
+    const res = await request(app).put('/api/user/onboarding').send(payload);
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe('Validation failed');
-    expect(res.body.details).toHaveLength(2);
+    expect(res.body.details).toHaveLength(4); // age, gender, activityLevel, goal
   });
 });

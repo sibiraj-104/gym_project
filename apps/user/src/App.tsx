@@ -8,10 +8,19 @@ export default function App() {
   const [goal, setGoal] = useState<
     'lose_weight' | 'build_muscle' | 'maintain_weight'
   >('build_muscle');
+  const gender = 'male';
+  const activityLevel = 'moderate';
   const [validationMsg, setValidationMsg] = useState<string>('');
 
   const handleValidate = () => {
-    const result = onboardingSchema.safeParse({ age, weight, height, goal });
+    const result = onboardingSchema.safeParse({
+      age,
+      weight,
+      height,
+      gender,
+      activityLevel,
+      goal,
+    });
     if (result.success) {
       setValidationMsg('✅ Onboarding data is valid!');
     } else {
