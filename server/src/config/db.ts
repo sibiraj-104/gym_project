@@ -5,6 +5,7 @@
 // ============================================================
 
 import mongoose from 'mongoose';
+import { logger } from './logger';
 import { env } from './env';
 
 /** Maximum number of connection retry attempts */
@@ -25,16 +26,16 @@ export async function connectDatabase(): Promise<void> {
 
   // Attach event listeners (fires on every reconnect too)
   mongoose.connection.on('connected', () => {
-    console.log(`✅ MongoDB connected: ${mongoose.connection.host}`);
+    logger.info(`✅ MongoDB connected: ${mongoose.connection.host}`);
     retryCount = 0; // Reset retry counter on successful connection
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.warn('⚠️  MongoDB disconnected. Attempting to reconnect...');
+    logger.warn('⚠️  MongoDB disconnected. Attempting to reconnect...');
   });
 
   mongoose.connection.on('error', (err: Error) => {
-    console.error('❌ MongoDB connection error:', err.message);
+    logger.error('❌ MongoDB connection error:', { message: err.message });
   });
 
   await attemptConnection();
@@ -54,15 +55,15 @@ async function attemptConnection(): Promise<void> {
     retryCount++;
 
     if (retryCount >= MAX_RETRIES) {
-      console.error(
+      logger.error(
         `❌ Failed to connect to MongoDB after ${MAX_RETRIES} attempts. Exiting.`,
-        err,
+        { error: err },
       );
       process.exit(1);
     }
 
     const delayMs = BASE_DELAY_MS * Math.pow(2, retryCount - 1);
-    console.warn(
+    logger.warn(
       `⏳ MongoDB connection attempt ${retryCount}/${MAX_RETRIES} failed. Retrying in ${delayMs}ms...`,
     );
     await new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -76,13 +77,13 @@ async function attemptConnection(): Promise<void> {
  */
 export async function closeDatabase(): Promise<void> {
   await mongoose.connection.close();
-  console.log('🔌 MongoDB connection closed gracefully.');
+  logger.info('🔌 MongoDB connection closed gracefully.');
 }
 
 /** Register graceful shutdown handlers */
 export function registerShutdownHandlers(): void {
   const shutdown = async (signal: string) => {
-    console.log(`\n📛 Received ${signal}. Shutting down gracefully...`);
+    logger.info(`📛 Received ${signal}. Shutting down gracefully...`);
     await closeDatabase();
     process.exit(0);
   };

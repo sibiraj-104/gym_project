@@ -8,13 +8,14 @@ on:
 
 jobs:
   lint:
+    name: Lint (ESLint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           version: 11
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: 'pnpm'
@@ -23,13 +24,14 @@ jobs:
       - run: pnpm run lint:all
 
   typecheck:
+    name: Type Check (tsc --noEmit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           version: 11
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: 'pnpm'
@@ -37,17 +39,66 @@ jobs:
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm run typecheck:all
 
-  test-workspaces:
+  test-user:
+    name: Test — User App (Vitest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           version: 11
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm run build:all
-      - run: pnpm run test:all
+      - run: pnpm --filter gymfuel-shared run build
+      - run: pnpm --filter gymfuel-user run test
+
+  test-admin:
+    name: Test — Admin Panel (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm --filter gymfuel-shared run build
+      - run: pnpm --filter gymfuel-admin run test
+
+  test-landing:
+    name: Test — Landing Page (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm --filter gymfuel-shared run build
+      - run: pnpm --filter gymfuel-landing run test
+
+  test-server:
+    name: Test — Backend Server (Jest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm --filter gymfuel-shared run build
+      - run: pnpm --filter gymfuel-server run test
