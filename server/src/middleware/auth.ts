@@ -13,18 +13,11 @@
 // ============================================================
 
 import type { Request, Response, NextFunction } from 'express';
-import { verifyJWT, JwtPayload } from '../utils/token';
+import { verifyJWT } from '../utils/token';
 import { Errors } from './errorHandler';
 
-// ── Extend Express Request type ───────────────────────────
-// Augments the express-serve-static-core module so req.user is
-// typed across every controller without needing a global namespace.
-
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: JwtPayload;
-  }
-}
+// req.user is typed globally via server/src/types/express.d.ts
+// which augments the Express.Request interface.
 
 // ── Auth Middleware ───────────────────────────────────────────
 
