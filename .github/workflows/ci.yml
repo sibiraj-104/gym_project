@@ -17,9 +17,9 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm run lint:all
 
@@ -33,9 +33,9 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm run typecheck:all
 
@@ -49,9 +49,9 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm --filter gymfuel-user run test
 
@@ -65,9 +65,9 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm --filter gymfuel-admin run test
 
@@ -81,9 +81,9 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm --filter gymfuel-landing run test
 
@@ -97,8 +97,8 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter gymfuel-shared run build
       - run: pnpm --filter gymfuel-server run test
