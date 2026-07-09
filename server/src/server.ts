@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { HealthCheckResponseSchema, onboardingSchema } from 'gymfuel-shared';
 import { z } from 'zod';
 import { env } from './config/env';
@@ -16,6 +17,7 @@ const app = express();
 app.use(helmet()); // Security headers
 app.use(cors({ origin: env.CORS_ORIGINS, credentials: true })); // CORS
 app.use(express.json()); // JSON parsing
+app.use(cookieParser()); // Parse httpOnly cookies (needed by authMiddleware)
 app.use(requestId); // Inject unique Request ID
 app.use(requestLogger); // HTTP request logging
 
