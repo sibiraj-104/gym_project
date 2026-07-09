@@ -91,4 +91,4 @@ jobs:
       - name: Health check — staging API
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            https://staging-api.gymfuel.com/api/system/health
+            https://staging-api.rkvnova.com/api/system/health
