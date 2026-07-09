@@ -14,7 +14,7 @@ services:
     restart: always
 
   gymfuel-api:
-    image: ghcr.io/sibiraj-104/gymfuel-server:staging
+    image: ghcr.io/sibiraj-104/gymfuel-api:latest
     container_name: gymfuel-api-staging
     environment:
       - PORT=5000
