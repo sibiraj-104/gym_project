@@ -70,15 +70,13 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            mkdir -p /app/gymfuel
-            cd /app/gymfuel
+            mkdir -p ~/gymfuel
+            cd ~/gymfuel
             # Download/Sync staging compose configurations
             curl -fsSL https://raw.githubusercontent.com/sibiraj-104/gym_project/main/docker-compose.staging.yml -o docker-compose.staging.yml
-            # Authenticate with GHCR on VPS
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u sibiraj-104 --password-stdin
             # Pull new images and restart containers
-            docker compose -f docker-compose.staging.yml pull
-            docker compose -f docker-compose.staging.yml up -d --remove-orphans
+            sudo docker compose -f docker-compose.staging.yml pull
+            sudo docker compose -f docker-compose.staging.yml up -d --remove-orphans
 
   verify-deploy:
     name: Verify Staging Health Check
