@@ -70,7 +70,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            sudo rm -rf ~/gymfuel/nginx/staging.conf
+            sudo rm -rf ~/gymfuel/nginx
             mkdir -p ~/gymfuel/nginx
             cd ~/gymfuel
             # Download/Sync staging compose configurations using exact commit SHA to bypass cache
