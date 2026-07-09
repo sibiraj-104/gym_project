@@ -65,14 +65,20 @@ jobs:
     steps:
       - name: SSH Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          envs: JWT_SECRET,ADMIN_JWT_SECRET
           script: |
             sudo rm -rf ~/gymfuel/nginx
             mkdir -p ~/gymfuel/nginx
             cd ~/gymfuel
+            # Write secrets to .env file for docker compose
+            printf 'JWT_SECRET=%s\nADMIN_JWT_SECRET=%s\n' "$JWT_SECRET" "$ADMIN_JWT_SECRET" > .env
             # Download/Sync staging compose configurations using exact commit SHA to bypass cache
             curl -fsSL https://raw.githubusercontent.com/sibiraj-104/gym_project/${{ github.sha }}/docker-compose.staging.yml -o docker-compose.staging.yml
             curl -fsSL https://raw.githubusercontent.com/sibiraj-104/gym_project/${{ github.sha }}/nginx/staging.conf -o nginx/staging.conf
