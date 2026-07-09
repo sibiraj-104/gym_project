@@ -74,6 +74,8 @@ jobs:
             cd ~/gymfuel
             # Download/Sync staging compose configurations
             curl -fsSL https://raw.githubusercontent.com/sibiraj-104/gym_project/main/docker-compose.staging.yml -o docker-compose.staging.yml
+            # Authenticate with GHCR using temporary action token
+            echo "${{ secrets.GITHUB_TOKEN }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
             # Pull new images and restart containers
             sudo docker compose -f docker-compose.staging.yml pull
             sudo docker compose -f docker-compose.staging.yml up -d --remove-orphans
