@@ -1,0 +1,28 @@
+name: 'PR Lint'
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  pr-title-lint:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Title against Conventional Commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Optionally specify a list of allowed scopes here, e.g. 'feature, fix, chore'
+          # If left empty, it accepts any scope or no scope.
+
+          # Enforce that a scope is not necessary, but if provided it is valid format.
+          requireScope: false
+
+          # When a PR only has one commit, GitHub suggests using that commit message
+          # as PR title. This ensures the action only fails the PR title itself.
+          validateSingleCommit: false

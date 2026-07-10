@@ -37,7 +37,10 @@ const envSchema = z.object({
 
   // ── Firebase ──────────────────────────────────────────────
   FIREBASE_PROJECT_ID: z.string().optional(),
-  FIREBASE_CLIENT_EMAIL: z.string().email().optional(),
+  FIREBASE_CLIENT_EMAIL: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().email().optional(),
+  ),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
 
   // ── Cloudinary ────────────────────────────────────────────
@@ -51,7 +54,10 @@ const envSchema = z.object({
   // ── Web Push (VAPID) ──────────────────────────────────────
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
-  VAPID_EMAIL: z.string().email().optional(),
+  VAPID_EMAIL: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().email().optional(),
+  ),
 
   // ── Email (SMTP) ──────────────────────────────────────────
   SMTP_HOST: z.string().optional(),
