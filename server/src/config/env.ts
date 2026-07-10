@@ -8,82 +8,100 @@
 import { z } from 'zod';
 import 'dotenv/config';
 
-const envSchema = z.object({
-  // ── Application ───────────────────────────────────────────
-  NODE_ENV: z.enum(['development', 'production', 'test'], {
-    errorMap: () => ({
-      message: 'NODE_ENV must be development, production, or test',
+const envSchema = z
+  .object({
+    // ── Application ───────────────────────────────────────────
+    NODE_ENV: z.enum(['development', 'production', 'test'], {
+      errorMap: () => ({
+        message: 'NODE_ENV must be development, production, or test',
+      }),
     }),
-  }),
-  PORT: z.coerce.number().int().min(1024).max(65535).default(5000),
+    PORT: z.coerce.number().int().min(1024).max(65535).default(5000),
 
-  // ── Database ──────────────────────────────────────────────
-  MONGO_URI: z.string().min(1, 'MONGO_URI is required'),
-  REDIS_URI: z
-    .string()
-    .min(1, 'REDIS_URI is required')
-    .default('redis://localhost:6379'),
+    // ── Database ──────────────────────────────────────────────
+    MONGO_URI: z.string().min(1, 'MONGO_URI is required'),
+    REDIS_URI: z
+      .string()
+      .min(1, 'REDIS_URI is required')
+      .default('redis://localhost:6379'),
 
-  // ── JWT ───────────────────────────────────────────────────
-  JWT_SECRET: z
-    .string()
-    .min(32, 'JWT_SECRET must be at least 32 characters for security'),
-  JWT_EXPIRES_IN: z.string().default('7d'),
-  ADMIN_JWT_SECRET: z
-    .string()
-    .min(32, 'ADMIN_JWT_SECRET must be at least 32 characters')
-    .optional(),
-  ADMIN_JWT_EXPIRES_IN: z.string().default('8h'),
+    // ── JWT ───────────────────────────────────────────────────
+    JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
+    JWT_EXPIRES_IN: z.string().default('7d'),
+    ADMIN_JWT_SECRET: z.string().optional(),
+    ADMIN_JWT_EXPIRES_IN: z.string().default('8h'),
 
-  // ── Firebase ──────────────────────────────────────────────
-  FIREBASE_PROJECT_ID: z.string().optional(),
-  FIREBASE_CLIENT_EMAIL: z.preprocess(
-    (val) => (val === '' ? undefined : val),
-    z.string().email().optional(),
-  ),
-  FIREBASE_PRIVATE_KEY: z.string().optional(),
+    // ── Firebase ──────────────────────────────────────────────
+    FIREBASE_PROJECT_ID: z.string().optional(),
+    FIREBASE_CLIENT_EMAIL: z.preprocess(
+      (val) => (val === '' ? undefined : val),
+      z.string().email().optional(),
+    ),
+    FIREBASE_PRIVATE_KEY: z.string().optional(),
 
-  // ── Cloudinary ────────────────────────────────────────────
-  CLOUDINARY_CLOUD_NAME: z.string().optional(),
-  CLOUDINARY_API_KEY: z.string().optional(),
-  CLOUDINARY_API_SECRET: z.string().optional(),
+    // ── Cloudinary ────────────────────────────────────────────
+    CLOUDINARY_CLOUD_NAME: z.string().optional(),
+    CLOUDINARY_API_KEY: z.string().optional(),
+    CLOUDINARY_API_SECRET: z.string().optional(),
 
-  // ── Gemini AI ─────────────────────────────────────────────
-  GEMINI_API_KEY: z.string().optional(),
+    // ── Gemini AI ─────────────────────────────────────────────
+    GEMINI_API_KEY: z.string().optional(),
 
-  // ── Web Push (VAPID) ──────────────────────────────────────
-  VAPID_PUBLIC_KEY: z.string().optional(),
-  VAPID_PRIVATE_KEY: z.string().optional(),
-  VAPID_EMAIL: z.preprocess(
-    (val) => (val === '' ? undefined : val),
-    z.string().email().optional(),
-  ),
-
-  // ── Email (SMTP) ──────────────────────────────────────────
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().int().default(587),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().default('GymFuel <noreply@gymfuel.com>'),
-
-  // ── External APIs ─────────────────────────────────────────
-  USDA_API_KEY: z.string().optional(),
-  NUTRITIONIX_APP_ID: z.string().optional(),
-  NUTRITIONIX_APP_KEY: z.string().optional(),
-
-  // ── CORS ──────────────────────────────────────────────────
-  CORS_ORIGINS: z
-    .string()
-    .default(
-      'http://localhost:5173,http://localhost:5174,http://localhost:5175',
+    // ── Web Push (VAPID) ──────────────────────────────────────
+    VAPID_PUBLIC_KEY: z.string().optional(),
+    VAPID_PRIVATE_KEY: z.string().optional(),
+    VAPID_EMAIL: z.preprocess(
+      (val) => (val === '' ? undefined : val),
+      z.string().email().optional(),
     ),
 
-  // ── Rate Limiting ─────────────────────────────────────────
-  RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(100),
+    // ── Email (SMTP) ──────────────────────────────────────────
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z.coerce.number().int().default(587),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASS: z.string().optional(),
+    SMTP_FROM: z.string().default('GymFuel <noreply@gymfuel.com>'),
 
-  // ── Logging ───────────────────────────────────────────────
-  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'debug']).default('info'),
-});
+    // ── External APIs ─────────────────────────────────────────
+    USDA_API_KEY: z.string().optional(),
+    NUTRITIONIX_APP_ID: z.string().optional(),
+    NUTRITIONIX_APP_KEY: z.string().optional(),
+
+    // ── CORS ──────────────────────────────────────────────────
+    CORS_ORIGINS: z
+      .string()
+      .default(
+        'http://localhost:5173,http://localhost:5174,http://localhost:5175',
+      ),
+
+    // ── Rate Limiting ─────────────────────────────────────────
+    RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(100),
+
+    // ── Logging ───────────────────────────────────────────────
+    LOG_LEVEL: z
+      .enum(['error', 'warn', 'info', 'http', 'debug'])
+      .default('info'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.NODE_ENV === 'production') {
+      if (data.JWT_SECRET.length < 32) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'JWT_SECRET must be at least 32 characters for security in production',
+          path: ['JWT_SECRET'],
+        });
+      }
+      if (data.ADMIN_JWT_SECRET && data.ADMIN_JWT_SECRET.length < 32) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'ADMIN_JWT_SECRET must be at least 32 characters for security in production',
+          path: ['ADMIN_JWT_SECRET'],
+        });
+      }
+    }
+  });
 
 /** Parse and validate all environment variables.
  *  Throws a ZodError with clear messages if any required var is missing/invalid.
