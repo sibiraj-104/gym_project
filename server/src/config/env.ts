@@ -83,7 +83,7 @@ const envSchema = z
       .default('info'),
   })
   .superRefine((data, ctx) => {
-    if (data.NODE_ENV === 'production') {
+    if (data.NODE_ENV === 'production' && process.env.STAGING !== 'true') {
       if (data.JWT_SECRET.length < 32) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,

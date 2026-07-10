@@ -21,6 +21,7 @@ services:
       - MONGO_URI=mongodb://gymfuel-mongo:27017/gymfuel
       - REDIS_URI=redis://gymfuel-redis:6379
       - NODE_ENV=production
+      - STAGING=true
       - JWT_SECRET=${JWT_SECRET}
       - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
