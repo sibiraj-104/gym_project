@@ -97,6 +97,7 @@ jobs:
             sleep 10
             sudo docker compose -f docker-compose.staging.yml ps
             sudo docker compose -f docker-compose.staging.yml logs gymfuel-api
+            sudo docker compose -f docker-compose.staging.yml logs gymfuel-mongo
 
   verify-deploy:
     name: Verify Staging Health Check
