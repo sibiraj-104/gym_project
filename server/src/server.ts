@@ -2,8 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import { HealthCheckResponseSchema, onboardingSchema } from 'gymfuel-shared';
-import { z } from 'zod';
+import { HealthCheckResponseSchema } from 'gymfuel-shared';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { connectDatabase, registerShutdownHandlers } from './config/db';
@@ -12,6 +11,7 @@ import { errorHandler, Errors } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
 
@@ -27,6 +27,9 @@ app.use(requestLogger); // HTTP request logging
 
 // 🔑 Authentication Routes
 app.use('/api/auth', authRoutes);
+
+// 👤 User Routes
+app.use('/api/user', userRoutes);
 
 // 🟢 Health check endpoint
 app.get('/api/system/health', (_req: Request, res: Response) => {
@@ -46,27 +49,6 @@ app.get('/api/system/health', (_req: Request, res: Response) => {
   }
 
   res.status(200).json(parsed.data);
-});
-
-// 🚀 Sample onboarding validation endpoint (Milestone 2 alignment)
-app.put('/api/user/onboarding', (req: Request, res: Response) => {
-  const result = onboardingSchema.safeParse(req.body);
-
-  if (!result.success) {
-    res.status(400).json({
-      error: 'Validation failed',
-      details: result.error.errors.map((err: z.ZodIssue) => ({
-        path: err.path.join('.'),
-        message: err.message,
-      })),
-    });
-    return;
-  }
-
-  res.status(200).json({
-    message: 'Onboarding completed successfully',
-    data: result.data,
-  });
 });
 
 // 🧪 Test route to trigger custom error
