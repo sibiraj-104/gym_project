@@ -610,7 +610,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="dash-root">
+    <div className="dash-root" data-testid="dashboard-page">
       {/* ── Cinematic Background Orbs ────────────────────────────────── */}
       <div className="dash-orbs" aria-hidden>
         <div className="dash-orb-1" />
@@ -626,7 +626,11 @@ export default function Dashboard() {
         </div>
         <div className="dash-nav-right">
           {user?.name && <div className="dash-nav-user">👤 {user.name}</div>}
-          <button className="dash-nav-logout" onClick={logout}>
+          <button
+            className="dash-nav-logout"
+            data-testid="logout-btn"
+            onClick={logout}
+          >
             Log out
           </button>
         </div>
