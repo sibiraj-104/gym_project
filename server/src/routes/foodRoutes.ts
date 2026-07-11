@@ -6,7 +6,12 @@
 
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth';
-import { searchFood, lookupBarcode } from '../controllers/foodController';
+import {
+  searchFood,
+  lookupBarcode,
+  scanFood,
+} from '../controllers/foodController';
+import { uploadSingleImage } from '../middleware/upload';
 
 const router = Router();
 
@@ -18,6 +23,9 @@ router.get('/search', searchFood);
 
 // GET /api/food/barcode/:code
 router.get('/barcode/:code', lookupBarcode);
+
+// POST /api/food/scan
+router.post('/scan', uploadSingleImage, scanFood);
 
 export default router;
 export const foodRoutes = router;
