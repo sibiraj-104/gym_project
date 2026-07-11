@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
+import ScannerPage from './pages/Scanner';
 
 export default function App() {
   const { fetchProfile, isInitialized } = useAuthStore();
@@ -34,6 +35,14 @@ export default function App() {
           element={
             <ProtectedRoute requireOnboarded={true}>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/scanner"
+          element={
+            <ProtectedRoute requireOnboarded={true}>
+              <ScannerPage />
             </ProtectedRoute>
           }
         />
