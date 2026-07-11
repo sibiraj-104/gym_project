@@ -1,7 +1,18 @@
 import { Router } from 'express';
-import { googleOneTapLogin, logoutUser } from '../controllers/authController';
+import {
+  googleOneTapLogin,
+  registerUser,
+  loginUser,
+  logoutUser,
+} from '../controllers/authController';
 
 const router = Router();
+
+// POST /api/auth/register - Register using Email + Password
+router.post('/register', registerUser);
+
+// POST /api/auth/login - Login using Email + Password
+router.post('/login', loginUser);
 
 // POST /api/auth/google - Authenticate using Google ID Token
 router.post('/google', googleOneTapLogin);

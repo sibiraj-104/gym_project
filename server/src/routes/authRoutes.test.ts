@@ -4,6 +4,7 @@ import app from '../server';
 import { User } from '../models/User';
 import { verifyGoogleToken } from '../utils/token';
 import { UserRole } from 'gymfuel-shared';
+import bcrypt from 'bcryptjs';
 
 // Mock the verifyGoogleToken utility
 jest.mock('../utils/token', () => {
@@ -123,6 +124,137 @@ describe('Auth Routes Integration Tests', () => {
 
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+  });
+
+  describe('POST /api/auth/register', () => {
+    it('returns 201 and sets JWT cookie for valid inputs', async () => {
+      const payload = {
+        name: 'Register User',
+        email: 'register@example.com',
+        password: 'securePassword123',
+      };
+
+      const res = await request(app).post('/api/auth/register').send(payload);
+
+      expect(res.status).toBe(201);
+      expect(res.body.message).toBe('Registration successful');
+      expect(res.body.user).toBeDefined();
+      expect(res.body.user.email).toBe('register@example.com');
+      expect(res.body.user.passwordHash).toBeUndefined();
+
+      // Check cookie
+      const cookieHeader = res.headers['set-cookie'];
+      expect(cookieHeader).toBeDefined();
+      expect(cookieHeader[0]).toContain('token=');
+
+      // Verify user in DB has hashed password
+      const userInDb = await User.findOne({
+        email: 'register@example.com',
+      }).select('+passwordHash');
+      expect(userInDb).toBeDefined();
+      expect(userInDb?.passwordHash).toBeDefined();
+      expect(userInDb?.passwordHash).not.toBe('securePassword123');
+    });
+
+    it('returns 409 Conflict when email is already registered', async () => {
+      // Pre-create user
+      await User.create({
+        name: 'Existing User',
+        email: 'duplicate@example.com',
+        passwordHash: 'dummyHash',
+        role: UserRole.USER,
+        isOnboarded: false,
+      });
+
+      const payload = {
+        name: 'Duplicate Register',
+        email: 'duplicate@example.com',
+        password: 'password123',
+      };
+
+      const res = await request(app).post('/api/auth/register').send(payload);
+
+      expect(res.status).toBe(409);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.code).toBe('CONFLICT');
+    });
+
+    it('returns 400 Validation Error for invalid email format', async () => {
+      const payload = {
+        name: 'Bad Email',
+        email: 'not-an-email',
+        password: 'password123',
+      };
+
+      const res = await request(app).post('/api/auth/register').send(payload);
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+
+    it('returns 400 Validation Error when password is too short', async () => {
+      const payload = {
+        name: 'Short Password',
+        email: 'short@example.com',
+        password: '123',
+      };
+
+      const res = await request(app).post('/api/auth/register').send(payload);
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    });
+  });
+
+  describe('POST /api/auth/login', () => {
+    beforeEach(async () => {
+      const hash = await bcrypt.hash('mySecretPassword', 10);
+      await User.create({
+        name: 'Login Test User',
+        email: 'login@example.com',
+        passwordHash: hash,
+        role: UserRole.USER,
+        isOnboarded: false,
+      });
+    });
+
+    it('returns 200 and sets JWT cookie for correct credentials', async () => {
+      const res = await request(app).post('/api/auth/login').send({
+        email: 'login@example.com',
+        password: 'mySecretPassword',
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Login successful');
+      expect(res.body.user).toBeDefined();
+      expect(res.body.user.email).toBe('login@example.com');
+
+      const cookieHeader = res.headers['set-cookie'];
+      expect(cookieHeader).toBeDefined();
+      expect(cookieHeader[0]).toContain('token=');
+    });
+
+    it('returns 401 Unauthorized for incorrect password', async () => {
+      const res = await request(app).post('/api/auth/login').send({
+        email: 'login@example.com',
+        password: 'wrongPassword',
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('Invalid email or password');
+    });
+
+    it('returns 401 Unauthorized for non-existent email', async () => {
+      const res = await request(app).post('/api/auth/login').send({
+        email: 'nonexistent@example.com',
+        password: 'mySecretPassword',
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('Invalid email or password');
     });
   });
 
