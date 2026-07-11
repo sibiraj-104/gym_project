@@ -273,6 +273,7 @@ export default function Onboarding() {
 
   return (
     <div
+      data-testid="onboarding-page"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -1102,6 +1103,7 @@ export default function Onboarding() {
 
           {step < 3 ? (
             <button
+              data-testid="next-btn"
               onClick={handleNext}
               style={{
                 display: 'flex',
@@ -1128,6 +1130,7 @@ export default function Onboarding() {
             </button>
           ) : (
             <button
+              data-testid="submit-btn"
               onClick={handleSubmit}
               disabled={isSubmitting}
               style={{

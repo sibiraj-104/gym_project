@@ -112,6 +112,7 @@ export default function Login() {
 
   return (
     <div
+      data-testid="login-page"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -329,6 +330,7 @@ export default function Login() {
                   }}
                 />
                 <input
+                  data-testid="login-email-input"
                   type="email"
                   placeholder="name@example.com"
                   disabled={isLoading}
@@ -401,6 +403,7 @@ export default function Login() {
                   }}
                 />
                 <input
+                  data-testid="login-password-input"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   disabled={isLoading}
@@ -465,6 +468,7 @@ export default function Login() {
 
             {/* Submit Button */}
             <button
+              data-testid="login-btn"
               type="submit"
               disabled={isLoading}
               style={{
@@ -531,6 +535,7 @@ export default function Login() {
                   }}
                 />
                 <input
+                  data-testid="name-input"
                   type="text"
                   placeholder="John Doe"
                   disabled={isLoading}
@@ -603,6 +608,7 @@ export default function Login() {
                   }}
                 />
                 <input
+                  data-testid="register-email-input"
                   type="email"
                   placeholder="name@example.com"
                   disabled={isLoading}
@@ -675,6 +681,7 @@ export default function Login() {
                   }}
                 />
                 <input
+                  data-testid="register-password-input"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   disabled={isLoading}
@@ -739,6 +746,7 @@ export default function Login() {
 
             {/* Submit Button */}
             <button
+              data-testid="register-btn"
               type="submit"
               disabled={isLoading}
               style={{
@@ -776,6 +784,7 @@ export default function Login() {
         {/* Toggle Mode */}
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <button
+            data-testid="toggle-mode-btn"
             onClick={handleToggleMode}
             disabled={isLoading}
             style={{
