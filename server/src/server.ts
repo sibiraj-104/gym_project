@@ -13,6 +13,7 @@ import { notFoundHandler } from './middleware/notFoundHandler';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import foodRoutes from './routes/foodRoutes';
+import mealRoutes from './routes/mealRoutes';
 
 const app = express();
 
@@ -34,6 +35,9 @@ app.use('/api/user', userRoutes);
 
 // 🥗 Food Routes
 app.use('/api/food', foodRoutes);
+
+// 🍽️ Meal Routes
+app.use('/api/meals', mealRoutes);
 
 // 🟢 Health check endpoint
 app.get('/api/system/health', (_req: Request, res: Response) => {
