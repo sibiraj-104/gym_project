@@ -280,6 +280,7 @@ export async function getTodayLog(
     const remainingCalories = Math.max(0, goalCalories - totals.calories);
 
     res.status(200).json({
+      logId: mealLog?._id?.toString() || undefined,
       date,
       meals,
       totals,

@@ -53,4 +53,27 @@ export const foodApi = {
     }
     return data.foodItem;
   },
+
+  /**
+   * Search food items by name
+   */
+  async search(
+    query: string,
+    page = 1,
+    limit = 20,
+  ): Promise<{
+    results: IFoodItem[];
+    count: number;
+    page: number;
+    limit: number;
+  }> {
+    const res = await fetch(
+      `${API_BASE}/food/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`,
+    );
+    const data = await safeJson(res);
+    if (!res.ok) {
+      throw new Error(data.error?.message || 'Failed to search food.');
+    }
+    return data;
+  },
 };

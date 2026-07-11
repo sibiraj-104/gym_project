@@ -42,6 +42,7 @@ export interface IMealLog {
 
 /** What the API returns for "today's log" */
 export interface IDailyLogSummary {
+  logId?: string; // MongoDB _id of the MealLog document (if it exists)
   date: string;
   meals: IMealEntry[];
   totals: IDailyTotals;
