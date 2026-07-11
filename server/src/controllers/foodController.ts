@@ -11,6 +11,8 @@ import { logger } from '../config/logger';
 import { FoodItem } from '../models/FoodItem';
 import { parseOpenFoodFacts, parseUSDAFood } from '../utils/foodParser';
 import { foodSearchSchema, barcodeSchema } from 'gymfuel-shared';
+import { cloudinary } from '../config/cloudinary';
+import { analyzeFoodImage } from '../utils/gemini';
 
 // Cache TTLs in seconds
 const SEARCH_CACHE_TTL = 300; // 5 minutes
@@ -257,6 +259,107 @@ export async function lookupBarcode(
     );
 
     res.status(200).json({ product: responseProduct });
+  } catch (err) {
+    next(err);
+  }
+}
+
+interface UploadResult {
+  secure_url: string;
+}
+
+const uploadToCloudinary = (fileBuffer: Buffer): Promise<UploadResult> => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'gymfuel_scans' },
+      (error, result) => {
+        if (error || !result) {
+          reject(error || new Error('Upload to Cloudinary failed'));
+        } else {
+          resolve(result);
+        }
+      },
+    );
+    stream.end(fileBuffer);
+  });
+};
+
+/**
+ * POST /api/food/scan
+ * Estimates nutrition of a food photo using Gemini 2.0 Flash with Redis rate limiting (20 daily scans).
+ */
+export async function scanFood(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+      });
+      return;
+    }
+
+    // 1. Daily rate limit check (20 scans per user per day)
+    const todayStr = new Date().toISOString().split('T')[0];
+    const rateLimitKey = `gf_scan_limit:${userId}:${todayStr}`;
+
+    const currentCount = await redis.incr(rateLimitKey);
+    if (currentCount === 1) {
+      await redis.expire(rateLimitKey, 86400); // 24 hours expiry
+    }
+
+    if (currentCount > 20) {
+      res.status(429).json({
+        error: {
+          code: 'TOO_MANY_REQUESTS',
+          message:
+            'Daily scan limit reached. You can run up to 20 scans per day.',
+        },
+      });
+      return;
+    }
+
+    // 2. Validate file presence
+    if (!req.file) {
+      res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'No image file uploaded.',
+        },
+      });
+      return;
+    }
+
+    // 3. Upload buffer to Cloudinary
+    logger.debug(`Uploading food photo for user ${userId} to Cloudinary...`);
+    const uploadResult = await uploadToCloudinary(req.file.buffer);
+
+    // 4. Send to Gemini for estimation
+    logger.debug(`Sending food photo to Gemini: ${uploadResult.secure_url}`);
+    const analysis = await analyzeFoodImage(uploadResult.secure_url);
+
+    // 5. Handle non-food image classifications
+    if (analysis.error) {
+      res.status(400).json({
+        error: {
+          code: 'NOT_FOOD',
+          message: 'The uploaded image does not appear to be a food item.',
+          details: analysis.error,
+        },
+      });
+      return;
+    }
+
+    // 6. Return response
+    res.status(200).json({
+      name: analysis.name,
+      nutrition: analysis.nutrition,
+      confidence: analysis.confidence,
+      imageUrl: uploadResult.secure_url,
+    });
   } catch (err) {
     next(err);
   }
