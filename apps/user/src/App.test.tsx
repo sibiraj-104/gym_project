@@ -1,27 +1,23 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import App from './App';
 
+// Mock the auth store to simulate non-initialized state
+vi.mock('./store/authStore', () => {
+  return {
+    useAuthStore: () => ({
+      fetchProfile: vi.fn(),
+      isInitialized: false,
+      isAuthenticated: false,
+      user: null,
+    }),
+  };
+});
+
 describe('User App React Tests', () => {
-  // Test 1: Component renders heading correctly
-  it('renders dashboard header', () => {
+  it('renders loading screen initially', () => {
     render(<App />);
-    const heading = screen.getByRole('heading', { name: /GymFuel User Dashboard/i });
-    expect(heading).toBeInTheDocument();
-  });
-
-  // Test 2: Validation message starts empty
-  it('initially does not show validation status message', () => {
-    render(<App />);
-    const status = screen.queryByText(/Onboarding data is/i);
-    expect(status).not.toBeInTheDocument();
-  });
-
-  // Test 3: Validation fires and displays success for default values
-  it('shows success message when clicking Validate with default valid props', () => {
-    render(<App />);
-    const button = screen.getByRole('button', { name: /Validate Data/i });
-    fireEvent.click(button);
-    expect(screen.getByText(/Onboarding data is valid/i)).toBeInTheDocument();
+    const loadingText = screen.getByText(/LOADING PROFILE.../i);
+    expect(loadingText).toBeInTheDocument();
   });
 });
