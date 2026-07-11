@@ -1,99 +1,120 @@
-import { useState } from 'react';
-import { onboardingSchema } from 'gymfuel-shared';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import Login from './pages/Login';
 
-export default function App() {
-  const [age, setAge] = useState<number>(25);
-  const [weight, setWeight] = useState<number>(70);
-  const [height, setHeight] = useState<number>(175);
-  const [goal, setGoal] = useState<
-    'lose_weight' | 'build_muscle' | 'maintain_weight'
-  >('build_muscle');
-  const gender = 'male';
-  const activityLevel = 'moderate';
-  const [validationMsg, setValidationMsg] = useState<string>('');
-
-  const handleValidate = () => {
-    const result = onboardingSchema.safeParse({
-      age,
-      weight,
-      height,
-      gender,
-      activityLevel,
-      goal,
-    });
-    if (result.success) {
-      setValidationMsg('✅ Onboarding data is valid!');
-    } else {
-      setValidationMsg(
-        `❌ Validation failed: ${result.error.errors[0].message}`,
-      );
-    }
-  };
-
+// Placeholder for Onboarding page
+function OnboardingPlaceholder() {
+  const { user, logout } = useAuthStore();
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>GymFuel User Dashboard</h1>
-      <p>Welcome to your fitness and nutrition tracker.</p>
-
-      <div
+    <div
+      style={{
+        padding: '2rem',
+        backgroundColor: '#09090b',
+        color: '#fff',
+        minHeight: '100vh',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+      }}
+    >
+      <h1>Welcome, {user?.name || 'User'}!</h1>
+      <h2>Onboarding Wizard (Coming Soon)</h2>
+      <p>Please complete your body stats and goals setup.</p>
+      <button
+        onClick={logout}
         style={{
-          border: '1px solid #ccc',
-          padding: '1rem',
-          marginTop: '1rem',
-          borderRadius: '8px',
+          padding: '0.5rem 1rem',
+          backgroundColor: '#ef4444',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
         }}
       >
-        <h3>Onboarding Mock Validator</h3>
-        <label>
-          Age:
-          <input
-            type="number"
-            value={age}
-            onChange={(e) => setAge(Number(e.target.value))}
-          />
-        </label>
-        <br />
-        <label>
-          Weight (kg):
-          <input
-            type="number"
-            value={weight}
-            onChange={(e) => setWeight(Number(e.target.value))}
-          />
-        </label>
-        <br />
-        <label>
-          Height (cm):
-          <input
-            type="number"
-            value={height}
-            onChange={(e) => setHeight(Number(e.target.value))}
-          />
-        </label>
-        <br />
-        <label>
-          Goal:
-          <select
-            value={goal}
-            onChange={(e) =>
-              setGoal(
-                e.target.value as
-                  | 'lose_weight'
-                  | 'build_muscle'
-                  | 'maintain_weight',
-              )
-            }
-          >
-            <option value="lose_weight">Lose Weight</option>
-            <option value="build_muscle">Build Muscle</option>
-            <option value="maintain_weight">Maintain Weight</option>
-          </select>
-        </label>
-        <br />
-        <br />
-        <button onClick={handleValidate}>Validate Data</button>
-        {validationMsg && <p>{validationMsg}</p>}
-      </div>
+        Logout
+      </button>
     </div>
+  );
+}
+
+// Placeholder for Dashboard page
+function DashboardPlaceholder() {
+  const { user, logout } = useAuthStore();
+  return (
+    <div
+      style={{
+        padding: '2rem',
+        backgroundColor: '#09090b',
+        color: '#fff',
+        minHeight: '100vh',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+      }}
+    >
+      <h1>GymFuel Dashboard</h1>
+      <p>Hello, {user?.name}! You have successfully completed onboarding.</p>
+      <button
+        onClick={logout}
+        style={{
+          padding: '0.5rem 1rem',
+          backgroundColor: '#ef4444',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+        }}
+      >
+        Logout
+      </button>
+    </div>
+  );
+}
+
+export default function App() {
+  const { fetchProfile, isInitialized } = useAuthStore();
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute requireOnboarded={false}>
+              <OnboardingPlaceholder />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute requireOnboarded={true}>
+              <DashboardPlaceholder />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all Redirect */}
+        <Route
+          path="*"
+          element={
+            isInitialized ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <div style={{ backgroundColor: '#09090b', minHeight: '100vh' }} />
+            )
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
