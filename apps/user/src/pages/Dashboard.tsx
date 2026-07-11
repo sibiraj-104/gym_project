@@ -5,6 +5,7 @@ import {
   useMotionValue,
   useSpring,
 } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import './Dashboard.css';
 
@@ -625,6 +626,20 @@ export default function Dashboard() {
           <span className="dash-nav-title">GymFuel</span>
         </div>
         <div className="dash-nav-right">
+          <Link
+            to="/scanner"
+            style={{
+              background: 'linear-gradient(135deg, #c8ff00, #8bc34a)',
+              color: '#0b0b0f',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              fontSize: '0.85rem',
+            }}
+          >
+            📸 Scan Food
+          </Link>
           {user?.name && <div className="dash-nav-user">👤 {user.name}</div>}
           <button
             className="dash-nav-logout"
