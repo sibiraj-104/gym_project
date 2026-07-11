@@ -8,6 +8,7 @@
 // ============================================================
 
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 import { env } from '../config/env';
 import { UserRole } from 'gymfuel-shared';
 
@@ -90,4 +91,57 @@ export function verifyAdminJWT(token: string): JwtPayload {
   });
 
   return decoded as JwtPayload;
+}
+
+// ── Google / Firebase Token Verification ──────────────────────
+
+const oauth2Client = new OAuth2Client();
+
+export interface GoogleUserPayload {
+  uid: string;
+  email: string;
+  name: string;
+  picture?: string;
+}
+
+/**
+ * Verifies a Google/Firebase ID token sent by the client.
+ * Uses google-auth-library to fetch certificates, check signatures,
+ * and validate expiry/audience.
+ *
+ * @param token - Raw ID token string from client
+ */
+export async function verifyGoogleToken(
+  token: string,
+): Promise<GoogleUserPayload> {
+  const projectId = env.FIREBASE_PROJECT_ID;
+  if (!projectId) {
+    throw new Error('FIREBASE_PROJECT_ID is not configured');
+  }
+
+  const ticket = await oauth2Client.verifyIdToken({
+    idToken: token,
+    audience: projectId,
+  });
+
+  const payload = ticket.getPayload();
+  if (!payload) {
+    throw new Error('Invalid Google token payload');
+  }
+
+  const expectedIssuer = `https://securetoken.google.com/${projectId}`;
+  if (payload.iss !== expectedIssuer) {
+    throw new Error('Invalid token issuer');
+  }
+
+  if (!payload.email) {
+    throw new Error('Email not provided in token');
+  }
+
+  return {
+    uid: payload.sub,
+    email: payload.email,
+    name: payload.name || payload.email.split('@')[0],
+    picture: payload.picture,
+  };
 }

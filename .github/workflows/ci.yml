@@ -90,6 +90,15 @@ jobs:
   test-server:
     name: Test — Backend Server (Jest)
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
