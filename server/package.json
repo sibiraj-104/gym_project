@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --runInBand",
     "typecheck": "tsc --noEmit",
     "db:init": "tsx src/scripts/init-db.ts",
     "db:seed": "tsx src/scripts/seed-db.ts"

@@ -12,6 +12,9 @@ export * from './validators';
 // ── Constants & Enums ───────────────────────────────────────
 export * from './constants';
 
+// ── Utilities ───────────────────────────────────────────────
+export * from './utils/calculators';
+
 // ── Legacy (keep for backward compatibility) ─────────────────
 import { z } from 'zod';
 
