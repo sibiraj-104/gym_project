@@ -3,40 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
-
-// Placeholder for Onboarding page
-function OnboardingPlaceholder() {
-  const { user, logout } = useAuthStore();
-  return (
-    <div
-      style={{
-        padding: '2rem',
-        backgroundColor: '#09090b',
-        color: '#fff',
-        minHeight: '100vh',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-      }}
-    >
-      <h1>Welcome, {user?.name || 'User'}!</h1>
-      <h2>Onboarding Wizard (Coming Soon)</h2>
-      <p>Please complete your body stats and goals setup.</p>
-      <button
-        onClick={logout}
-        style={{
-          padding: '0.5rem 1rem',
-          backgroundColor: '#ef4444',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-        }}
-      >
-        Logout
-      </button>
-    </div>
-  );
-}
+import Onboarding from './pages/Onboarding';
 
 // Placeholder for Dashboard page
 function DashboardPlaceholder() {
@@ -90,7 +57,7 @@ export default function App() {
           path="/onboarding"
           element={
             <ProtectedRoute requireOnboarded={false}>
-              <OnboardingPlaceholder />
+              <Onboarding />
             </ProtectedRoute>
           }
         />
