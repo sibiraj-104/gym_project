@@ -22,6 +22,23 @@ interface AuthState {
 
 const API_BASE = '/api';
 
+/** Safely parse JSON — throws a human-readable error if the server is unreachable or returns empty body */
+async function safeJson(res: Response) {
+  const text = await res.text();
+  if (!text || text.trim() === '') {
+    throw new Error(
+      'Unable to reach the server. Please make sure the backend is running.',
+    );
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(
+      'Server returned an unexpected response. Please try again.',
+    );
+  }
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
@@ -40,7 +57,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) {
         throw new Error(
           data.error?.message || 'Login failed. Please check your credentials.',
@@ -65,7 +82,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) {
         throw new Error(data.error?.message || 'Registration failed.');
       }
