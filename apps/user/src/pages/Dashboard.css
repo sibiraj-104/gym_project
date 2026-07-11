@@ -1,0 +1,880 @@
+/* ================================================================
+   GymFuel Dashboard — Responsive Stylesheet
+   Breakpoints: mobile-first
+   xs: 0–479px | sm: 480–767px | md: 768–1023px | lg: 1024px+
+   ================================================================ */
+
+/* ── Reset & Base ─────────────────────────────────────────────── */
+.dash-root {
+  min-height: 100vh;
+  background-color: #0b0b0f;
+  color: #ffffff;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── Background Orbs ─────────────────────────────────────────── */
+.dash-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.dash-orb-1 {
+  position: absolute;
+  top: -15%;
+  right: -5%;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(200, 255, 0, 0.1) 0%,
+    transparent 65%
+  );
+}
+.dash-orb-2 {
+  position: absolute;
+  bottom: -10%;
+  left: -10%;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.08) 0%,
+    transparent 65%
+  );
+}
+.dash-orb-3 {
+  position: absolute;
+  top: 40%;
+  right: -5%;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 229, 255, 0.06) 0%,
+    transparent 65%
+  );
+}
+
+/* ── Nav ─────────────────────────────────────────────────────── */
+.dash-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(11, 11, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  gap: 0.75rem;
+}
+.dash-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.dash-nav-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #c8ff00, #8bc34a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: #0b0b0f;
+  box-shadow: 0 0 16px rgba(200, 255, 0, 0.4);
+  flex-shrink: 0;
+}
+.dash-nav-title {
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: -0.04em;
+}
+.dash-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dash-nav-user {
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+.dash-nav-logout {
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 77, 77, 0.08);
+  border: 1px solid rgba(255, 77, 77, 0.2);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ff7070;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Page Wrapper ─────────────────────────────────────────────── */
+.dash-page {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 5rem;
+}
+
+/* ── Hero Header ─────────────────────────────────────────────── */
+.dash-hero {
+  margin-bottom: 1.75rem;
+}
+.dash-hero-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #c8ff00;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.dash-hero-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 6vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+.dash-hero-gradient {
+  background: linear-gradient(90deg, #fff 40%, #c8ff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dash-hero-sub {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.42);
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+/* ── BENTO GRID ──────────────────────────────────────────────── */
+.dash-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    'calring'
+    'macros'
+    'hydration'
+    'actions'
+    'log';
+}
+
+/* Bento Cards — shared glass style */
+.dash-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Calorie Ring Cell ──────────────────────────────────────── */
+.dash-cell-calring {
+  grid-area: calring;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+}
+.dash-ring-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 130px;
+  background: radial-gradient(
+    ellipse,
+    rgba(200, 255, 0, 0.12) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.dash-ring-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.dash-ring-stat-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.dash-ring-stat-val {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+/* ── Macros Cell ─────────────────────────────────────────────── */
+.dash-cell-macros {
+  grid-area: macros;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.dash-macro-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 1.1rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.dash-macro-card:hover {
+  transform: translateY(-2px);
+}
+.dash-macro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+.dash-macro-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.dash-macro-val {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-top: 2px;
+}
+.dash-macro-goal {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.28);
+  margin-top: 1px;
+}
+.dash-macro-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.dash-macro-bar-track {
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  margin-top: 0.85rem;
+}
+.dash-macro-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dash-macro-pct {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-align: right;
+  margin-top: 3px;
+}
+.dash-macro-glow {
+  position: absolute;
+  top: -25px;
+  right: -25px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+/* ── Hydration Cell ─────────────────────────────────────────── */
+.dash-cell-hydration {
+  grid-area: hydration;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+.dash-hydration-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.1rem;
+}
+.dash-hydration-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.dash-hydration-count {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.dash-hydration-count span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+}
+.dash-hydration-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.dash-water-jar {
+  width: 60px;
+  height: 96px;
+  border-radius: 0 0 13px 13px;
+  border: 2px solid rgba(0, 229, 255, 0.18);
+  border-top: none;
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 229, 255, 0.02);
+  flex-shrink: 0;
+}
+.dash-water-jar-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dash-water-jar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.8);
+}
+.dash-water-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dash-water-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  border: none;
+  font-size: 1.35rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.dash-water-btn:active {
+  transform: scale(0.92);
+}
+.dash-water-btn-add {
+  background-color: #00e5ff;
+  color: #0b0b0f;
+  box-shadow: 0 4px 16px rgba(0, 229, 255, 0.3);
+}
+.dash-water-btn-remove {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #fff;
+}
+.dash-water-btn-remove:disabled {
+  color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+/* Hydration glass icons grid */
+.dash-hydration-glasses {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 1rem;
+}
+.dash-glass-icon {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+.dash-glass-filled {
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+}
+.dash-glass-empty {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  opacity: 0.4;
+}
+
+/* ── Actions Row ─────────────────────────────────────────────── */
+.dash-cell-actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.dash-cta-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #c8ff00, #9ccc00);
+  border: none;
+  border-radius: 14px;
+  color: #0b0b0f;
+  padding: 0.85rem 1.5rem;
+  font-weight: 900;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 6px 22px rgba(200, 255, 0, 0.32);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  white-space: nowrap;
+}
+.dash-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(200, 255, 0, 0.42);
+}
+.dash-cta-btn:active {
+  transform: scale(0.97);
+}
+.dash-stats-pills {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: flex-end;
+}
+.dash-stat-pill {
+  padding: 0.45rem 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.dash-stat-pill-label {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.32);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.dash-stat-pill-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* ── Log Feed ─────────────────────────────────────────────────── */
+.dash-cell-log {
+  grid-area: log;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+.dash-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.dash-log-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.dash-log-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.73rem;
+  color: rgba(255, 255, 255, 0.32);
+}
+.dash-log-clear {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 77, 77, 0.6);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+}
+.dash-log-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+.dash-log-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.6rem;
+}
+.dash-log-empty-title {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.95rem;
+}
+.dash-log-empty-desc {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.22);
+  max-width: 240px;
+  margin-inline: auto;
+  line-height: 1.5;
+}
+.dash-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.dash-log-list::-webkit-scrollbar {
+  width: 4px;
+}
+.dash-log-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dash-log-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+/* Meal Item */
+.dash-meal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s;
+  gap: 0.75rem;
+}
+.dash-meal-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.dash-meal-info {
+  flex: 1;
+  min-width: 0;
+}
+.dash-meal-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-meal-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.dash-meal-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+.dash-meal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.dash-meal-calories {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  white-space: nowrap;
+}
+.dash-meal-delete {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.dash-meal-delete:hover {
+  color: #ff4d4d;
+}
+
+/* ── Modal ────────────────────────────────────────────────────── */
+.dash-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 999;
+  padding: 0;
+}
+.dash-modal-sheet {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(16, 16, 20, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px 24px 0 0;
+  padding: 1.75rem 1.5rem 2.5rem;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-sizing: border-box;
+  position: relative;
+}
+.dash-modal-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 auto 1.5rem;
+}
+.dash-modal-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+.dash-modal-glow {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 100px;
+  background: radial-gradient(
+    ellipse,
+    rgba(200, 255, 0, 0.15) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.dash-modal-error {
+  background: rgba(255, 77, 77, 0.08);
+  border: 1px solid rgba(255, 77, 77, 0.22);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 1rem;
+  font-size: 0.78rem;
+  color: #ff7070;
+}
+.dash-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+.dash-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.dash-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+}
+.dash-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: #fff;
+  padding: 0.72rem 1rem;
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.dash-input:focus {
+  border-color: rgba(200, 255, 0, 0.5);
+}
+.dash-macro-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.7rem;
+}
+.dash-form-btns {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+}
+.dash-btn-cancel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0.78rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.dash-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+.dash-btn-submit {
+  flex: 2;
+  background: #c8ff00;
+  border: none;
+  border-radius: 12px;
+  color: #0b0b0f;
+  padding: 0.78rem;
+  font-weight: 900;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 18px rgba(200, 255, 0, 0.28);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.dash-btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 26px rgba(200, 255, 0, 0.38);
+}
+.dash-btn-submit:active {
+  transform: scale(0.97);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tablet (≥ 640px) ─────────────────────────────────────────── */
+@media (min-width: 640px) {
+  .dash-page {
+    padding: 1.75rem 1.5rem 5rem;
+  }
+  .dash-nav {
+    padding: 1rem 1.75rem;
+  }
+  .dash-nav-user {
+    max-width: 180px;
+  }
+  .dash-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'calring calring'
+      'macros  hydration'
+      'actions actions'
+      'log     log';
+  }
+  .dash-cell-calring {
+    flex-wrap: nowrap;
+  }
+  .dash-modal-overlay {
+    align-items: center;
+    padding: 1rem;
+  }
+  .dash-modal-sheet {
+    border-radius: 24px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .dash-modal-handle {
+    display: none;
+  }
+}
+
+/* ── Desktop (≥ 1024px) ──────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .dash-page {
+    padding: 2rem 1.5rem 4rem;
+  }
+  .dash-nav {
+    padding: 1.1rem 2rem;
+  }
+  .dash-grid {
+    grid-template-columns: 5fr 4fr 3fr;
+    grid-template-areas:
+      'calring  macros  hydration'
+      'actions  actions actions'
+      'log      log     log';
+    gap: 1.25rem;
+  }
+  .dash-cell-calring {
+    gap: 2rem;
+  }
+  .dash-hero-title {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+  }
+  .dash-macro-val {
+    font-size: 1.9rem;
+  }
+}
+
+/* ── Large Desktop (≥ 1280px) ──────────────────────────────── */
+@media (min-width: 1280px) {
+  .dash-nav-user {
+    max-width: 220px;
+  }
+}
