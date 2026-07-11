@@ -1,53 +1,47 @@
-# Walkthrough — Issue #12: Google Auth Verification
+# Walkthrough — Issue #13: Email/Password Auth Backend
 
-I have completed the backend implementation for **Issue #12 (Google/Firebase One-Tap Token Verification & User Session Creation)** under Milestone 2.
+I have implemented the traditional email/password registration and login backend endpoints under Milestone 2.
 
 ---
 
 ## 🛠️ Changes Completed
 
-### 1. Token Utilities
+### 1. Controllers & Input Validation
 
-- [token.ts](file:///c:/AI-augmented/gym_project/server/src/utils/token.ts): Imported `OAuth2Client` from `google-auth-library` and added the `verifyGoogleToken(token)` helper function. It validates the Firebase ID token signature, expiration, and checks that audience and issuer match the configured `FIREBASE_PROJECT_ID`.
+- [authController.ts](file:///c:/AI-augmented/gym_project/server/src/controllers/authController.ts):
+  - Defined Zod schemas for input validation: `registerSchema` (requires name, email, password min 6 chars) and `loginSchema`.
+  - Implemented `registerUser`: checks for email conflicts, hashes passwords using `bcryptjs`, creates the user document, and sets a secure JWT `token` cookie.
+  - Implemented `loginUser`: retrieves the user's hashed password, compares it using `bcryptjs`, verifies the user isn't banned, updates their active status, and sets the secure session cookie.
 
-### 2. Controllers
+### 2. Routes
 
-- [authController.ts](file:///c:/AI-augmented/gym_project/server/src/controllers/authController.ts): Implemented `googleOneTapLogin` and `logoutUser` controllers.
-  - Verifies the token payload.
-  - Finds existing users by `googleId` or `email` (links Google Auth automatically).
-  - Auto-registers new users.
-  - Sets a secure `token` cookie (httpOnly, sameSite: strict, secure in production).
-  - Returns the sanitized user payload.
+- [authRoutes.ts](file:///c:/AI-augmented/gym_project/server/src/routes/authRoutes.ts): Registered `POST /api/auth/register` and `POST /api/auth/login` endpoints.
 
-### 3. Routes
+### 3. Integration Tests
 
-- [authRoutes.ts](file:///c:/AI-augmented/gym_project/server/src/routes/authRoutes.ts): Configured POST `/api/auth/google` and POST `/api/auth/logout`.
-- [server.ts](file:///c:/AI-augmented/gym_project/server/src/server.ts): Registered `/api/auth` routes.
-
-### 4. Integration Tests
-
-- [authRoutes.test.ts](file:///c:/AI-augmented/gym_project/server/src/routes/authRoutes.test.ts): Wrote comprehensive tests covering:
-  - Valid token: new user registration, cookie verification, user data check.
-  - Valid token: existing user login, checking for duplicate records.
-  - Invalid token: returns `401 Unauthorized`.
-  - Missing token: returns `400 Validation Error`.
-  - Logout: clears token cookie.
+- [authRoutes.test.ts](file:///c:/AI-augmented/gym_project/server/src/routes/authRoutes.test.ts): Added comprehensive test coverage:
+  - Successful registration (verifies secure cookie is set, password is encrypted).
+  - Failed registration due to duplicate email (`409 Conflict`).
+  - Failed registration due to invalid parameters (`400 Validation Error`).
+  - Successful email/password login (`200 OK` + secure cookie).
+  - Failed login due to wrong credentials (`401 Unauthorized`).
+  - Failed login due to missing parameters.
 
 ---
 
 ## 🧪 Verification & Test Results
 
-All 20 tests pass successfully:
+All 27 backend tests ran and passed successfully:
 
 ```bash
 $ jest
 PASS src/utils/token.test.ts
-PASS src/server.test.ts (6.742 s)
-PASS src/routes/authRoutes.test.ts (7.411 s)
+PASS src/server.test.ts (5.053 s)
+PASS src/routes/authRoutes.test.ts (5.421 s)
 
 Test Suites: 3 passed, 3 total
-Tests:       20 passed, 20 total
+Tests:       27 passed, 27 total
 Snapshots:   0 total
-Time:        9.045 s
+Time:        6.798 s
 Ran all test suites.
 ```

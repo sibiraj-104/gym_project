@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
 import { verifyGoogleToken, generateJWT } from '../utils/token';
 import { Errors } from '../middleware/errorHandler';
@@ -9,6 +10,137 @@ import { UserRole } from 'gymfuel-shared';
 const googleLoginSchema = z.object({
   token: z.string().min(1, 'Token is required'),
 });
+
+const registerSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(60, 'Name must be at most 60 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+/**
+ * Handles traditional email/password user registration.
+ *
+ * POST /api/auth/register
+ */
+export async function registerUser(req: Request, res: Response): Promise<void> {
+  const { name, email, password } = registerSchema.parse(req.body);
+
+  // 1. Check if user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw Errors.conflict('A user with this email address already exists.');
+  }
+
+  // 2. Hash the password
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  // 3. Create the user
+  const user = await User.create({
+    name,
+    email,
+    passwordHash,
+    role: UserRole.USER,
+    isOnboarded: false,
+    streakCount: 0,
+    lastActiveAt: new Date(),
+  });
+
+  // 4. Generate App JWT
+  const appToken = generateJWT(user.id, user.role);
+
+  // 5. Set cookie
+  res.cookie('token', appToken, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+  });
+
+  // 6. Respond
+  res.status(201).json({
+    message: 'Registration successful',
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isOnboarded: user.isOnboarded,
+      profile: user.profile,
+      goals: user.goals,
+      streakCount: user.streakCount,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+  });
+}
+
+/**
+ * Handles traditional email/password login.
+ *
+ * POST /api/auth/login
+ */
+export async function loginUser(req: Request, res: Response): Promise<void> {
+  const { email, password } = loginSchema.parse(req.body);
+
+  // 1. Find user, explicitly selecting passwordHash
+  const user = await User.findOne({ email }).select('+passwordHash');
+  if (!user || !user.passwordHash) {
+    throw Errors.unauthorized('Invalid email or password.');
+  }
+
+  // 2. Verify password hash
+  const isMatch = await bcrypt.compare(password, user.passwordHash);
+  if (!isMatch) {
+    throw Errors.unauthorized('Invalid email or password.');
+  }
+
+  // 3. Check if user is banned
+  if (user.bannedAt) {
+    throw Errors.forbidden(
+      `Your account has been banned. Reason: ${user.bannedReason || 'No reason provided'}`,
+    );
+  }
+
+  // 4. Update last active timestamp
+  user.lastActiveAt = new Date();
+  await user.save();
+
+  // 5. Generate custom App JWT
+  const appToken = generateJWT(user.id, user.role);
+
+  // 6. Set httpOnly cookie
+  res.cookie('token', appToken, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+  });
+
+  // 7. Respond with user profile details
+  res.status(200).json({
+    message: 'Login successful',
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isOnboarded: user.isOnboarded,
+      profile: user.profile,
+      goals: user.goals,
+      streakCount: user.streakCount,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+  });
+}
 
 /**
  * Handles Google One-Tap authentication.
