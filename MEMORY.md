@@ -50,13 +50,19 @@ All nutrition calculations live in `shared/src/utils/calculators.ts` to keep the
 - Docker compose setup for local services (MongoDB 7.0, Redis 7-alpine).
 - CI Pipeline (.github/workflows/ci.yml) with database services.
 
-### Milestone 2 — Auth & Dashboard (In Progress)
+### Milestone 2 — Auth & Dashboard (100% Completed)
 
 - **Issue #12 (Done)**: Google/Firebase backend token verification and user auto-creation.
 - **Issue #13 (Done)**: Backend email/password registration (`/register`) and login (`/login`) endpoints.
 - **Issue #14 (Done)**: Backend profile fetch (`GET /api/user/profile`) and onboarding submission (`PUT /api/user/onboarding`) endpoints.
 - **Issue #15 (Done)**: Frontend auth store (Zustand), Firebase client configs, ProtectedRoute component, and responsive Login UI page.
-- **Issue #16 (Current)**: Frontend 3-step onboarding wizard flow (`/onboarding`).
+- **Issue #16 (Done)**: Frontend 3-step onboarding wizard flow (`/onboarding`).
+- **Issue #17 (Done)**: User Dashboard UI redesign (Bento grid, calorie ring, macros, hydration).
+- **Issue #18 (Done)**: Playwright E2E tests for authentication, onboarding, and dashboard routing flows.
+
+### Milestone 3 — Food Tracking & Calculator (In Progress)
+
+- **Issue #19 (Current)**: FoodItem + MealLog Mongoose models.
 
 ---
 
