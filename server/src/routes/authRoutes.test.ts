@@ -30,7 +30,9 @@ describe('Auth Routes Integration Tests', () => {
   afterAll(async () => {
     // Disconnect and clean up
     if (mongoose.connection.readyState !== 0) {
-      await mongoose.connection.db.dropDatabase();
+      if (mongoose.connection.db) {
+        await mongoose.connection.db.dropDatabase();
+      }
       await mongoose.connection.close();
     }
   });

@@ -105,7 +105,7 @@ export async function googleOneTapLogin(
  *
  * POST /api/auth/logout
  */
-export async function logoutUser(req: Request, res: Response): Promise<void> {
+export async function logoutUser(_req: Request, res: Response): Promise<void> {
   res.clearCookie('token', {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
