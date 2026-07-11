@@ -50,7 +50,7 @@ async function resolveExternalFood(foodId: string): Promise<IFoodItem> {
   // Check local database first
   const existing = await FoodItem.findOne({ barcode });
   if (existing) {
-    return existing;
+    return existing as unknown as IFoodItem;
   }
 
   // Fetch externally
@@ -72,7 +72,7 @@ async function resolveExternalFood(foodId: string): Promise<IFoodItem> {
 
     const parsed = parseOpenFoodFacts(data.product);
     const newFood = new FoodItem(parsed);
-    return await newFood.save();
+    return (await newFood.save()) as unknown as IFoodItem;
   } else if (prefix === 'usda') {
     const apiKey = env.USDA_API_KEY || 'DEMO_KEY';
     const url = `https://api.nal.usda.gov/fdc/v1/food/${id}?api_key=${apiKey}`;
@@ -86,7 +86,7 @@ async function resolveExternalFood(foodId: string): Promise<IFoodItem> {
       ...parsed,
       barcode, // save as usda-<id>
     });
-    return await newFood.save();
+    return (await newFood.save()) as unknown as IFoodItem;
   } else {
     throw Errors.badRequest(`Unsupported external food prefix: ${prefix}`);
   }
@@ -105,11 +105,9 @@ export async function logMeal(
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(401)
-        .json({
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+      });
       return;
     }
 
@@ -135,15 +133,14 @@ export async function logMeal(
     const isObjectId = mongoose.Types.ObjectId.isValid(foodId);
 
     if (isObjectId) {
-      foodItem = await FoodItem.findById(foodId);
-      if (!foodItem) {
-        res
-          .status(404)
-          .json({
-            error: { code: 'NOT_FOUND', message: 'Food item not found.' },
-          });
+      const localFood = await FoodItem.findById(foodId);
+      if (!localFood) {
+        res.status(404).json({
+          error: { code: 'NOT_FOUND', message: 'Food item not found.' },
+        });
         return;
       }
+      foodItem = localFood as unknown as IFoodItem;
     } else {
       // Resolve external off: or usda: item
       foodItem = await resolveExternalFood(foodId);
@@ -255,11 +252,9 @@ export async function getTodayLog(
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(401)
-        .json({
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+      });
       return;
     }
 
@@ -308,11 +303,9 @@ export async function getMealHistory(
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(401)
-        .json({
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+      });
       return;
     }
 
@@ -354,11 +347,9 @@ export async function deleteMealEntry(
   try {
     const userId = req.user?.userId;
     if (!userId) {
-      res
-        .status(401)
-        .json({
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
+      res.status(401).json({
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+      });
       return;
     }
 
@@ -380,23 +371,19 @@ export async function deleteMealEntry(
     // Find log and ensure it belongs to the authenticated user
     const mealLog = await MealLog.findOne({ _id: logId, userId });
     if (!mealLog) {
-      res
-        .status(404)
-        .json({
-          error: {
-            code: 'NOT_FOUND',
-            message: 'Meal log not found or unauthorized.',
-          },
-        });
+      res.status(404).json({
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Meal log not found or unauthorized.',
+        },
+      });
       return;
     }
 
     if (entryIndex < 0 || entryIndex >= mealLog.meals.length) {
-      res
-        .status(400)
-        .json({
-          error: { code: 'BAD_REQUEST', message: 'Invalid meal entry index.' },
-        });
+      res.status(400).json({
+        error: { code: 'BAD_REQUEST', message: 'Invalid meal entry index.' },
+      });
       return;
     }
 
