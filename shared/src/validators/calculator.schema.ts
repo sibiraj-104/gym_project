@@ -6,15 +6,15 @@ import { z } from 'zod';
 import { ActivityLevel, FitnessGoal, Gender } from '../types/user.types';
 
 export const tdeeCalcSchema = z.object({
-  weight: z
+  weight: z.coerce
     .number({ required_error: 'Weight is required' })
     .min(20, 'Weight must be at least 20 kg')
     .max(500, 'Weight cannot exceed 500 kg'),
-  height: z
+  height: z.coerce
     .number({ required_error: 'Height is required' })
     .min(50, 'Height must be at least 50 cm')
     .max(300, 'Height cannot exceed 300 cm'),
-  age: z
+  age: z.coerce
     .number({ required_error: 'Age is required' })
     .int('Age must be a whole number')
     .min(10, 'Must be at least 10 years old')
@@ -30,11 +30,11 @@ export const tdeeCalcSchema = z.object({
 export type TDEECalcInput = z.infer<typeof tdeeCalcSchema>;
 
 export const bmiCalcSchema = z.object({
-  weight: z
+  weight: z.coerce
     .number({ required_error: 'Weight is required' })
     .min(20, 'Weight must be at least 20 kg')
     .max(500, 'Weight cannot exceed 500 kg'),
-  height: z
+  height: z.coerce
     .number({ required_error: 'Height is required' })
     .min(50, 'Height must be at least 50 cm')
     .max(300, 'Height cannot exceed 300 cm'),
@@ -43,7 +43,7 @@ export const bmiCalcSchema = z.object({
 export type BMICalcInput = z.infer<typeof bmiCalcSchema>;
 
 export const proteinCalcSchema = z.object({
-  weight: z
+  weight: z.coerce
     .number({ required_error: 'Weight is required' })
     .min(20, 'Weight must be at least 20 kg')
     .max(500, 'Weight cannot exceed 500 kg'),
@@ -55,11 +55,11 @@ export const proteinCalcSchema = z.object({
 export type ProteinCalcInput = z.infer<typeof proteinCalcSchema>;
 
 export const oneRepMaxCalcSchema = z.object({
-  weight: z
+  weight: z.coerce
     .number({ required_error: 'Weight is required' })
     .min(1, 'Weight must be at least 1 kg')
     .max(1000, 'Weight cannot exceed 1000 kg'),
-  reps: z
+  reps: z.coerce
     .number({ required_error: 'Reps is required' })
     .int('Reps must be a whole number')
     .min(1, 'Reps must be at least 1')

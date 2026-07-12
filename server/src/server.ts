@@ -14,6 +14,7 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import foodRoutes from './routes/foodRoutes';
 import mealRoutes from './routes/mealRoutes';
+import calculatorRoutes from './routes/calculatorRoutes';
 
 const app = express();
 
@@ -38,6 +39,9 @@ app.use('/api/food', foodRoutes);
 
 // 🍽️ Meal Routes
 app.use('/api/meals', mealRoutes);
+
+// 🧮 Calculator Routes
+app.use('/api/calculator', calculatorRoutes);
 
 // 🟢 Health check endpoint
 app.get('/api/system/health', (_req: Request, res: Response) => {
