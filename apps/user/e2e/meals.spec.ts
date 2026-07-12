@@ -235,7 +235,7 @@ test.describe('Meal Logger Page (/meals) — E2E', () => {
     page,
   }) => {
     let logCallCount = 0;
-    let todayLogCallCount = 0;
+    let foodLogged = false;
 
     // Set up all mocks explicitly (no setupMealPageMocks to avoid dual today-log route)
     await page.route('**/api/user/profile', async (route) => {
@@ -264,10 +264,9 @@ test.describe('Meal Logger Page (/meals) — E2E', () => {
       });
     });
 
-    // GET /api/meals/log/today: first call returns empty, subsequent return logged state
+    // GET /api/meals/log/today: returns empty log until food is logged
     await page.route('**/api/meals/log/today', async (route) => {
-      todayLogCallCount++;
-      const body = todayLogCallCount === 1 ? mockEmptyLog : mockLogAfterChicken;
+      const body = foodLogged ? mockLogAfterChicken : mockEmptyLog;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -275,10 +274,11 @@ test.describe('Meal Logger Page (/meals) — E2E', () => {
       });
     });
 
-    // POST /api/meals/log → return logged chicken state
+    // POST /api/meals/log → return logged chicken state and set state flag
     await page.route('**/api/meals/log', async (route) => {
       if (route.request().method() === 'POST') {
         logCallCount++;
+        foodLogged = true;
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
