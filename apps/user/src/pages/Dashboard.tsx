@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import { IMealEntry, IDailyTotals } from 'gymfuel-shared';
 import {
   motion,
   AnimatePresence,
   useMotionValue,
   useSpring,
 } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { mealsApi } from '../api/mealsApi';
 import './Dashboard.css';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -540,7 +542,17 @@ function AddMealModal({
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
-  const [meals, setMeals] = useState<MealLog[]>([]);
+  const navigate = useNavigate();
+  const [meals, setMeals] = useState<IMealEntry[]>([]);
+  const [totals, setTotals] = useState<IDailyTotals>({
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    fiber: 0,
+    waterGlasses: 0,
+  });
+  const [logId, setLogId] = useState<string | null>(null);
   const [water, setWater] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
@@ -550,22 +562,26 @@ export default function Dashboard() {
   const fatGoal = user?.goals?.targetFat ?? 65;
   const waterGoal = user?.goals?.targetWaterGlasses ?? 8;
 
+  const fetchTodayLog = async () => {
+    try {
+      const data = await mealsApi.getTodayLog();
+      setMeals(data.meals);
+      setTotals(data.totals);
+      if (data.logId) {
+        setLogId(data.logId);
+      }
+    } catch (err) {
+      console.error('Failed to fetch today log', err);
+    }
+  };
+
   // ── Persist per day ───────────────────────────────────────────────────────
   useEffect(() => {
+    fetchTodayLog();
     const key = new Date().toDateString();
-    const m = localStorage.getItem(`gf_meals_${key}`);
     const w = localStorage.getItem(`gf_water_${key}`);
-    if (m) setMeals(JSON.parse(m));
     if (w) setWater(parseInt(w) || 0);
   }, []);
-
-  const saveMeals = (list: MealLog[]) => {
-    setMeals(list);
-    localStorage.setItem(
-      `gf_meals_${new Date().toDateString()}`,
-      JSON.stringify(list),
-    );
-  };
 
   const saveWater = (n: number) => {
     setWater(n);
@@ -573,29 +589,34 @@ export default function Dashboard() {
   };
 
   // ── Computed totals ────────────────────────────────────────────────────────
-  const totalCal = meals.reduce((s, m) => s + m.calories, 0);
-  const totalPro = meals.reduce((s, m) => s + m.protein, 0);
-  const totalCarb = meals.reduce((s, m) => s + m.carbs, 0);
-  const totalFat = meals.reduce((s, m) => s + m.fat, 0);
+  const totalCal = totals.calories;
+  const totalPro = totals.protein;
+  const totalCarb = totals.carbs;
+  const totalFat = totals.fat;
   const calPct = Math.min(100, Math.round((totalCal / calorieGoal) * 100));
   const remaining = Math.max(0, calorieGoal - totalCal);
   const ringColor = calPct < 50 ? CYAN : calPct < 80 ? ORANGE : LIME;
 
-  const addMeal = (data: Omit<MealLog, 'id' | 'timestamp'>) => {
-    const meal: MealLog = {
-      ...data,
-      id: Math.random().toString(36).slice(2),
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    };
-    saveMeals([meal, ...meals]);
+  const addMeal = () => {
     setShowModal(false);
+    navigate('/meals');
   };
 
-  const deleteMeal = (id: string) =>
-    saveMeals(meals.filter((m) => m.id !== id));
+  const deleteMeal = async (index: number) => {
+    try {
+      let currentLogId = logId;
+      if (!currentLogId) {
+        const currentLog = await mealsApi.getTodayLog();
+        currentLogId = currentLog.logId ?? null;
+      }
+      if (currentLogId) {
+        await mealsApi.deleteMealEntry(currentLogId, index);
+        await fetchTodayLog();
+      }
+    } catch (err) {
+      console.error('Failed to delete meal entry', err);
+    }
+  };
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -626,6 +647,22 @@ export default function Dashboard() {
           <span className="dash-nav-title">GymFuel</span>
         </div>
         <div className="dash-nav-right">
+          <Link
+            to="/meals"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#ffffff',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              fontSize: '0.85rem',
+              marginRight: '0.5rem',
+            }}
+          >
+            🍽️ Meal Log
+          </Link>
           <Link
             to="/scanner"
             style={{
@@ -824,17 +861,6 @@ export default function Dashboard() {
                     : `${meals.length} meal${meals.length > 1 ? 's' : ''} logged`}
                 </p>
               </div>
-              {meals.length > 0 && (
-                <button
-                  className="dash-log-clear"
-                  onClick={() => {
-                    if (window.confirm("Reset all today's meals?"))
-                      saveMeals([]);
-                  }}
-                >
-                  Clear All
-                </button>
-              )}
             </div>
 
             {meals.length === 0 ? (
@@ -849,9 +875,27 @@ export default function Dashboard() {
             ) : (
               <div className="dash-log-list">
                 <AnimatePresence mode="popLayout">
-                  {meals.map((m) => (
-                    <MealItem key={m.id} meal={m} onDelete={deleteMeal} />
-                  ))}
+                  {meals.map((m, index) => {
+                    const mappedMeal = {
+                      id: String(index),
+                      name: m.foodName,
+                      calories: m.nutrition.calories,
+                      protein: m.nutrition.protein,
+                      carbs: m.nutrition.carbs,
+                      fat: m.nutrition.fat,
+                      timestamp: new Date(m.loggedAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      }),
+                    };
+                    return (
+                      <MealItem
+                        key={mappedMeal.id}
+                        meal={mappedMeal}
+                        onDelete={(id) => deleteMeal(Number(id))}
+                      />
+                    );
+                  })}
                 </AnimatePresence>
               </div>
             )}
