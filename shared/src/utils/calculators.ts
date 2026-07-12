@@ -103,3 +103,77 @@ export function calculateMacroTargets(
     targetWaterGlasses,
   };
 }
+
+/**
+ * Calculates Body Mass Index (BMI) and provides classification.
+ */
+export function calculateBMI(
+  weight: number,
+  height: number,
+): { bmi: number; classification: string } {
+  const heightMeters = height / 100;
+  const bmi = weight / (heightMeters * heightMeters);
+  const roundedBmi = Math.round(bmi * 10) / 10;
+
+  let classification = 'Normal';
+  if (roundedBmi < 18.5) {
+    classification = 'Underweight';
+  } else if (roundedBmi < 25.0) {
+    classification = 'Normal';
+  } else if (roundedBmi < 30.0) {
+    classification = 'Overweight';
+  } else {
+    classification = 'Obese';
+  }
+
+  return {
+    bmi: roundedBmi,
+    classification,
+  };
+}
+
+/**
+ * Calculates recommended daily protein range (min/max in grams) based on goal.
+ */
+export function calculateProteinTarget(
+  weight: number,
+  goal: FitnessGoal,
+): { min: number; max: number } {
+  let minFactor = 1.2;
+  let maxFactor = 1.6;
+
+  if (goal === FitnessGoal.BUILD_MUSCLE) {
+    minFactor = 2.0;
+    maxFactor = 2.4;
+  } else if (goal === FitnessGoal.LOSE_WEIGHT) {
+    minFactor = 1.8;
+    maxFactor = 2.2;
+  } else if (goal === FitnessGoal.MAINTAIN_WEIGHT) {
+    minFactor = 1.2;
+    maxFactor = 1.6;
+  } else {
+    minFactor = 1.4;
+    maxFactor = 1.8;
+  }
+
+  return {
+    min: Math.round(weight * minFactor),
+    max: Math.round(weight * maxFactor),
+  };
+}
+
+/**
+ * Estimates One-Rep Max (1RM) using Epley formula.
+ */
+export function calculateEpley1RM(
+  weight: number,
+  reps: number,
+): { oneRepMax: number } {
+  if (reps <= 1) {
+    return { oneRepMax: Math.round(weight) };
+  }
+  const oneRepMax = weight * (1 + reps / 30);
+  return {
+    oneRepMax: Math.round(oneRepMax),
+  };
+}
