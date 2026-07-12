@@ -224,7 +224,7 @@ export default function MealsPage() {
   );
 
   return (
-    <div className="meals-root">
+    <div className="meals-root" data-testid="meals-page">
       {/* Background Cinematic Orbs */}
       <div className="meals-orbs" aria-hidden>
         <div className="meals-orb-1" />
@@ -255,7 +255,7 @@ export default function MealsPage() {
         </div>
 
         {/* Daily Summary Bento Cards */}
-        <div className="meals-summary-grid">
+        <div className="meals-summary-grid" data-testid="daily-summary">
           {/* Calorie Card */}
           <div className="meals-summary-card calories">
             <div
@@ -264,7 +264,7 @@ export default function MealsPage() {
             />
             <div className="meals-summary-title">Calories</div>
             <div className="meals-summary-main">
-              <span className="meals-summary-val">
+              <span className="meals-summary-val" data-testid="total-calories">
                 {totals.calories.toLocaleString()}
               </span>
               <span className="meals-summary-goal">/ {calorieGoal} kcal</span>
@@ -362,6 +362,7 @@ export default function MealsPage() {
                 <input
                   type="text"
                   className="meals-search-input"
+                  data-testid="food-search-input"
                   placeholder="Search banana, chicken breast, milk..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -373,6 +374,7 @@ export default function MealsPage() {
               <AnimatePresence>
                 {searchResults.length > 0 && (
                   <motion.div
+                    data-testid="search-results-list"
                     className="meals-search-results"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -382,6 +384,7 @@ export default function MealsPage() {
                       <div
                         key={food._id}
                         className="meals-search-item"
+                        data-testid={`search-result-item-${food._id}`}
                         onClick={() => {
                           setSelectedFood(food);
                           setPortionGrams(food.servingSize || 100);
@@ -449,6 +452,7 @@ export default function MealsPage() {
                         <input
                           type="number"
                           className="meals-input"
+                          data-testid="portion-input"
                           min={1}
                           value={portionGrams}
                           onChange={(e) =>
@@ -461,6 +465,7 @@ export default function MealsPage() {
                         <label className="meals-label">Meal Section</label>
                         <select
                           className="meals-select"
+                          data-testid="meal-type-select"
                           value={mealType}
                           onChange={(e) =>
                             setMealType(
@@ -535,6 +540,7 @@ export default function MealsPage() {
                     <div className="meals-log-actions">
                       <button
                         className="meals-btn-cancel"
+                        data-testid="cancel-log-btn"
                         onClick={() => setSelectedFood(null)}
                         disabled={actionLoading}
                       >
@@ -542,6 +548,7 @@ export default function MealsPage() {
                       </button>
                       <button
                         className="meals-btn-submit"
+                        data-testid="log-food-btn"
                         onClick={handleLogFood}
                         disabled={actionLoading || portionGrams <= 0}
                       >
@@ -570,7 +577,11 @@ export default function MealsPage() {
                 {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => {
                   const sectionMeals = getMealsByType(type);
                   return (
-                    <div key={type} className="meals-section-card">
+                    <div
+                      key={type}
+                      className="meals-section-card"
+                      data-testid={`section-${type}`}
+                    >
                       <div className="meals-section-header">
                         <div
                           style={{
@@ -634,6 +645,7 @@ export default function MealsPage() {
                                   </span>
                                   <button
                                     className="meals-delete-btn"
+                                    data-testid={`delete-meal-btn-${meal.originalIndex}`}
                                     onClick={() =>
                                       handleDeleteEntry(meal.originalIndex)
                                     }
