@@ -60,9 +60,21 @@ All nutrition calculations live in `shared/src/utils/calculators.ts` to keep the
 - **Issue #17 (Done)**: User Dashboard UI redesign (Bento grid, calorie ring, macros, hydration).
 - **Issue #18 (Done)**: Playwright E2E tests for authentication, onboarding, and dashboard routing flows.
 
-### Milestone 3 — Food Tracking & Calculator (In Progress)
+### Milestone 3 — Food Tracking & Calculator (100% Completed)
 
-- **Issue #19 (Current)**: FoodItem + MealLog Mongoose models.
+- **Issue #19 (Done)**: FoodItem + MealLog Mongoose models with unit tests.
+- **Issue #20 (Done)**: Backend food search and barcode lookup with Redis caching.
+- **Issue #21 (Done)**: Backend AI photo food scan route with rate limiting.
+- **Issue #22 (Done)**: Backend meal logging routes and controller with streak tracking.
+- **Issue #23 (Done)**: Frontend barcode + AI photo scan page.
+- **Issue #24 (Done)**: Frontend `/meals` page with food search, log, and daily totals.
+
+### Milestone 4 — Calculators & Alerts (In Progress)
+
+- **Issue #25 (Done)**: Core calculator logic, types, and validation schemas in shared package.
+- **Issue #26 (Done)**: Backend fitness calculator API routes and controller.
+- **Issue #27 (Done)**: Frontend `/calculator` page & tabbed UI.
+- **Issue #28 (Current)**: Backend nutrition alerts API & daily engine.
 
 ---
 
