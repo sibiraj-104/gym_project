@@ -18,6 +18,7 @@ import {
   Gender,
   ActivityLevel,
   FitnessGoal,
+  AlertType,
 } from 'gymfuel-shared';
 
 import {
@@ -27,6 +28,10 @@ import {
   Sparkles,
   Dumbbell,
   Target,
+  Bell,
+  Mail,
+  Smartphone,
+  Check,
 } from 'lucide-react';
 import './Calculator.css';
 
@@ -36,7 +41,7 @@ const CYAN = '#00E5FF';
 const ORANGE = '#FF6B35';
 const PURPLE = '#A855F7';
 
-type TabType = 'tdee' | 'bmi' | 'protein' | '1rm';
+type TabType = 'tdee' | 'bmi' | 'protein' | '1rm' | 'alerts';
 
 export default function CalculatorPage() {
   const navigate = useNavigate();
@@ -82,9 +87,100 @@ export default function CalculatorPage() {
   const [ormReps, setOrmReps] = useState('5');
   const [ormResult, setOrmResult] = useState<OneRepMaxResponse | null>(null);
 
+  // 5. Daily Alerts State
+  const [alertsLoading, setAlertsLoading] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [caloriesAlert, setCaloriesAlert] = useState({
+    isEnabled: true,
+    thresholdPct: 50,
+    emailEnabled: true,
+    pushEnabled: false,
+  });
+  const [waterAlert, setWaterAlert] = useState({
+    isEnabled: true,
+    thresholdPct: 75,
+    emailEnabled: false,
+    pushEnabled: true,
+  });
+  const [proteinAlert, setProteinAlert] = useState({
+    isEnabled: false,
+    thresholdPct: 80,
+    emailEnabled: true,
+    pushEnabled: true,
+  });
+
+  // Fetch alert configs when alerts tab is active
+  useEffect(() => {
+    if (activeTab === 'alerts') {
+      const loadAlerts = async () => {
+        setAlertsLoading(true);
+        setError(null);
+        try {
+          const configs = await calculatorApi.getAlertConfigs();
+          const cal = configs.find((c) => c.type === 'calories');
+          if (cal) {
+            setCaloriesAlert({
+              isEnabled: cal.isEnabled,
+              thresholdPct: cal.thresholdPct,
+              emailEnabled: cal.emailEnabled,
+              pushEnabled: cal.pushEnabled,
+            });
+          }
+          const wat = configs.find((c) => c.type === 'water');
+          if (wat) {
+            setWaterAlert({
+              isEnabled: wat.isEnabled,
+              thresholdPct: wat.thresholdPct,
+              emailEnabled: wat.emailEnabled,
+              pushEnabled: wat.pushEnabled,
+            });
+          }
+          const pro = configs.find((c) => c.type === 'protein');
+          if (pro) {
+            setProteinAlert({
+              isEnabled: pro.isEnabled,
+              thresholdPct: pro.thresholdPct,
+              emailEnabled: pro.emailEnabled,
+              pushEnabled: pro.pushEnabled,
+            });
+          }
+        } catch (err: unknown) {
+          console.warn('Failed to load alert configs, using defaults', err);
+        } finally {
+          setAlertsLoading(false);
+        }
+      };
+      loadAlerts();
+    }
+  }, [activeTab]);
+
+  const handleSaveAlerts = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSaveSuccess(false);
+    setLoading(true);
+    try {
+      const payload = [
+        { type: AlertType.CALORIES, ...caloriesAlert },
+        { type: AlertType.WATER, ...waterAlert },
+        { type: AlertType.PROTEIN, ...proteinAlert },
+      ];
+      await calculatorApi.saveAlertConfigs(payload);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to save alert configs.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Clear errors when tab switches
   useEffect(() => {
     setError(null);
+    setSaveSuccess(false);
   }, [activeTab]);
 
   // Handlers
@@ -259,6 +355,11 @@ export default function CalculatorPage() {
               icon: <Target size={16} />,
             },
             { id: '1rm', label: '🏋️ 1-Rep Max', icon: <Dumbbell size={16} /> },
+            {
+              id: 'alerts',
+              label: '🔔 Daily Alerts',
+              icon: <Bell size={16} />,
+            },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -858,6 +959,353 @@ export default function CalculatorPage() {
                       </div>
                     )}
                   </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'alerts' && (
+              <motion.div
+                key="alerts"
+                className="calc-panel"
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 15 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="alerts-layout">
+                  <div className="alerts-info">
+                    <h3 className="panel-title">Nutrition Target Alerts</h3>
+                    <p className="panel-subtitle-desc">
+                      Configure automated daily checks to verify your dietary
+                      adherence. If your tracked consumption falls below the
+                      threshold percentage of your daily goals by the end of the
+                      day, GymFuel will dispatch alert notifications.
+                    </p>
+                  </div>
+
+                  {alertsLoading ? (
+                    <div className="alerts-loading">
+                      Loading alert configurations...
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSaveAlerts} className="alerts-form">
+                      <div className="alerts-grid">
+                        {/* 1. Calories Alert Card */}
+                        <div
+                          className={`alert-card ${caloriesAlert.isEnabled ? 'active' : ''}`}
+                        >
+                          <div className="alert-card-header">
+                            <div className="alert-card-title-group">
+                              <Flame size={20} style={{ color: LIME }} />
+                              <span className="alert-card-title">
+                                Daily Calorie Alert
+                              </span>
+                            </div>
+                            <label className="switch-toggle">
+                              <input
+                                type="checkbox"
+                                checked={caloriesAlert.isEnabled}
+                                onChange={(e) =>
+                                  setCaloriesAlert({
+                                    ...caloriesAlert,
+                                    isEnabled: e.target.checked,
+                                  })
+                                }
+                                data-testid="calories-enabled"
+                              />
+                              <span className="slider-switch" />
+                            </label>
+                          </div>
+                          {caloriesAlert.isEnabled && (
+                            <div className="alert-card-body">
+                              <div className="slider-group">
+                                <div className="slider-label-row">
+                                  <span>Deficit Warning Threshold</span>
+                                  <span
+                                    className="slider-value"
+                                    style={{ color: LIME }}
+                                  >
+                                    {caloriesAlert.thresholdPct}%
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="10"
+                                  max="100"
+                                  step="5"
+                                  value={caloriesAlert.thresholdPct}
+                                  onChange={(e) =>
+                                    setCaloriesAlert({
+                                      ...caloriesAlert,
+                                      thresholdPct: parseInt(e.target.value),
+                                    })
+                                  }
+                                  className="range-input"
+                                  data-testid="calories-threshold"
+                                />
+                                <span className="slider-desc">
+                                  Alert fires if total calorie intake falls
+                                  below {caloriesAlert.thresholdPct}% of TDEE
+                                  target.
+                                </span>
+                              </div>
+
+                              <div className="channels-group">
+                                <label className="channel-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={caloriesAlert.emailEnabled}
+                                    onChange={(e) =>
+                                      setCaloriesAlert({
+                                        ...caloriesAlert,
+                                        emailEnabled: e.target.checked,
+                                      })
+                                    }
+                                    data-testid="calories-email"
+                                  />
+                                  <Mail size={16} />
+                                  <span>Email Alerts</span>
+                                </label>
+                                <label className="channel-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={caloriesAlert.pushEnabled}
+                                    onChange={(e) =>
+                                      setCaloriesAlert({
+                                        ...caloriesAlert,
+                                        pushEnabled: e.target.checked,
+                                      })
+                                    }
+                                    data-testid="calories-push"
+                                  />
+                                  <Smartphone size={16} />
+                                  <span>Push Notifications</span>
+                                </label>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 2. Water Alert Card */}
+                        <div
+                          className={`alert-card ${waterAlert.isEnabled ? 'active' : ''}`}
+                        >
+                          <div className="alert-card-header">
+                            <div className="alert-card-title-group">
+                              <Activity size={20} style={{ color: CYAN }} />
+                              <span className="alert-card-title">
+                                Daily Hydration Alert
+                              </span>
+                            </div>
+                            <label className="switch-toggle">
+                              <input
+                                type="checkbox"
+                                checked={waterAlert.isEnabled}
+                                onChange={(e) =>
+                                  setWaterAlert({
+                                    ...waterAlert,
+                                    isEnabled: e.target.checked,
+                                  })
+                                }
+                                data-testid="water-enabled"
+                              />
+                              <span className="slider-switch" />
+                            </label>
+                          </div>
+                          {waterAlert.isEnabled && (
+                            <div className="alert-card-body">
+                              <div className="slider-group">
+                                <div className="slider-label-row">
+                                  <span>Hydration Warning Threshold</span>
+                                  <span
+                                    className="slider-value"
+                                    style={{ color: CYAN }}
+                                  >
+                                    {waterAlert.thresholdPct}%
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="10"
+                                  max="100"
+                                  step="5"
+                                  value={waterAlert.thresholdPct}
+                                  onChange={(e) =>
+                                    setWaterAlert({
+                                      ...waterAlert,
+                                      thresholdPct: parseInt(e.target.value),
+                                    })
+                                  }
+                                  className="range-input"
+                                  data-testid="water-threshold"
+                                />
+                                <span className="slider-desc">
+                                  Alert fires if total glasses consumed falls
+                                  below {waterAlert.thresholdPct}% of hydration
+                                  target.
+                                </span>
+                              </div>
+
+                              <div className="channels-group">
+                                <label className="channel-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={waterAlert.emailEnabled}
+                                    onChange={(e) =>
+                                      setWaterAlert({
+                                        ...waterAlert,
+                                        emailEnabled: e.target.checked,
+                                      })
+                                    }
+                                    data-testid="water-email"
+                                  />
+                                  <Mail size={16} />
+                                  <span>Email Alerts</span>
+                                </label>
+                                <label className="channel-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={waterAlert.pushEnabled}
+                                    onChange={(e) =>
+                                      setWaterAlert({
+                                        ...waterAlert,
+                                        pushEnabled: e.target.checked,
+                                      })
+                                    }
+                                    data-testid="water-push"
+                                  />
+                                  <Smartphone size={16} />
+                                  <span>Push Notifications</span>
+                                </label>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 3. Protein Alert Card */}
+                        <div
+                          className={`alert-card ${proteinAlert.isEnabled ? 'active' : ''}`}
+                        >
+                          <div className="alert-card-header">
+                            <div className="alert-card-title-group">
+                              <Target size={20} style={{ color: PURPLE }} />
+                              <span className="alert-card-title">
+                                Daily Protein Alert
+                              </span>
+                            </div>
+                            <label className="switch-toggle">
+                              <input
+                                type="checkbox"
+                                checked={proteinAlert.isEnabled}
+                                onChange={(e) =>
+                                  setProteinAlert({
+                                    ...proteinAlert,
+                                    isEnabled: e.target.checked,
+                                  })
+                                }
+                                data-testid="protein-enabled"
+                              />
+                              <span className="slider-switch" />
+                            </label>
+                          </div>
+                          {proteinAlert.isEnabled && (
+                            <div className="alert-card-body">
+                              <div className="slider-group">
+                                <div className="slider-label-row">
+                                  <span>Protein Warning Threshold</span>
+                                  <span
+                                    className="slider-value"
+                                    style={{ color: PURPLE }}
+                                  >
+                                    {proteinAlert.thresholdPct}%
+                                  </span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="10"
+                                  max="100"
+                                  step="5"
+                                  value={proteinAlert.thresholdPct}
+                                  onChange={(e) =>
+                                    setProteinAlert({
+                                      ...proteinAlert,
+                                      thresholdPct: parseInt(e.target.value),
+                                    })
+                                  }
+                                  className="range-input"
+                                  data-testid="protein-threshold"
+                                />
+                                <span className="slider-desc">
+                                  Alert fires if daily protein intake falls
+                                  below {proteinAlert.thresholdPct}% of goal.
+                                </span>
+                              </div>
+
+                              <div className="channels-group">
+                                <label className="channel-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={proteinAlert.emailEnabled}
+                                    onChange={(e) =>
+                                      setProteinAlert({
+                                        ...proteinAlert,
+                                        emailEnabled: e.target.checked,
+                                      })
+                                    }
+                                    data-testid="protein-email"
+                                  />
+                                  <Mail size={16} />
+                                  <span>Email Alerts</span>
+                                </label>
+                                <label className="channel-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={proteinAlert.pushEnabled}
+                                    onChange={(e) =>
+                                      setProteinAlert({
+                                        ...proteinAlert,
+                                        pushEnabled: e.target.checked,
+                                      })
+                                    }
+                                    data-testid="protein-push"
+                                  />
+                                  <Smartphone size={16} />
+                                  <span>Push Notifications</span>
+                                </label>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="alerts-submit-row">
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="calc-submit-btn alerts-save-btn"
+                          data-testid="alerts-submit"
+                        >
+                          {loading
+                            ? 'Saving Settings...'
+                            : 'Save Configuration'}
+                        </button>
+
+                        <AnimatePresence>
+                          {saveSuccess && (
+                            <motion.div
+                              className="save-success-msg"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <Check size={16} style={{ color: LIME }} />
+                              <span>Settings saved successfully!</span>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </form>
+                  )}
                 </div>
               </motion.div>
             )}
