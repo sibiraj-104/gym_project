@@ -1,4 +1,9 @@
-import { Gender, ActivityLevel, FitnessGoal } from 'gymfuel-shared';
+import {
+  Gender,
+  ActivityLevel,
+  FitnessGoal,
+  INutritionAlert,
+} from 'gymfuel-shared';
 
 const API_BASE = '/api';
 
@@ -118,6 +123,30 @@ export const calculatorApi = {
     const data = await safeJson(res);
     if (!res.ok) {
       throw new Error(data.error?.message || 'Failed to calculate 1-Rep Max.');
+    }
+    return data;
+  },
+
+  async getAlertConfigs(): Promise<INutritionAlert[]> {
+    const res = await fetch(`${API_BASE}/nutrition/alerts`);
+    const data = await safeJson(res);
+    if (!res.ok) {
+      throw new Error(data.error?.message || 'Failed to fetch alert configs.');
+    }
+    return data.alerts || [];
+  },
+
+  async saveAlertConfigs(
+    alerts: Partial<INutritionAlert>[],
+  ): Promise<{ alerts: INutritionAlert[] }> {
+    const res = await fetch(`${API_BASE}/nutrition/alerts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alerts }),
+    });
+    const data = await safeJson(res);
+    if (!res.ok) {
+      throw new Error(data.error?.message || 'Failed to save alert configs.');
     }
     return data;
   },

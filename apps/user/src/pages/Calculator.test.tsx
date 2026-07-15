@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CalculatorPage from './Calculator';
 import { calculatorApi } from '../api/calculatorApi';
-import { Gender, ActivityLevel, FitnessGoal } from 'gymfuel-shared';
+import {
+  Gender,
+  ActivityLevel,
+  FitnessGoal,
+  INutritionAlert,
+} from 'gymfuel-shared';
 
 // Mock calculatorApi
 vi.mock('../api/calculatorApi', () => ({
@@ -11,6 +16,8 @@ vi.mock('../api/calculatorApi', () => ({
     getBMI: vi.fn(),
     getProteinRange: vi.fn(),
     getOneRepMax: vi.fn(),
+    getAlertConfigs: vi.fn(),
+    saveAlertConfigs: vi.fn(),
   },
 }));
 
@@ -229,5 +236,105 @@ describe('CalculatorPage Component', () => {
     expect(screen.getByText('100')).toBeInTheDocument();
     expect(screen.getByText('95%')).toBeInTheDocument();
     expect(screen.getByText('95 kg/lbs')).toBeInTheDocument();
+  });
+
+  it('loads and displays existing alert configs when alerts tab is active', async () => {
+    const mockAlerts = [
+      {
+        type: 'calories',
+        thresholdPct: 60,
+        isEnabled: true,
+        emailEnabled: true,
+        pushEnabled: false,
+      },
+      {
+        type: 'water',
+        thresholdPct: 80,
+        isEnabled: false,
+        emailEnabled: false,
+        pushEnabled: false,
+      },
+    ];
+    vi.mocked(calculatorApi.getAlertConfigs).mockResolvedValue(
+      mockAlerts as unknown as INutritionAlert[],
+    );
+
+    render(<CalculatorPage />);
+
+    // Switch tab to alerts
+    const alertsTab = screen.getByTestId('tab-alerts');
+    fireEvent.click(alertsTab);
+
+    // Verify loading state or title
+    await waitFor(() => {
+      expect(screen.getByText('Nutrition Target Alerts')).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(calculatorApi.getAlertConfigs).toHaveBeenCalled();
+    });
+
+    // Check pre-filled values
+    const calEnabledInput = screen.getByTestId(
+      'calories-enabled',
+    ) as HTMLInputElement;
+    const waterEnabledInput = screen.getByTestId(
+      'water-enabled',
+    ) as HTMLInputElement;
+    const calThresholdInput = screen.getByTestId(
+      'calories-threshold',
+    ) as HTMLInputElement;
+
+    expect(calEnabledInput.checked).toBe(true);
+    expect(waterEnabledInput.checked).toBe(false);
+    expect(calThresholdInput.value).toBe('60');
+  });
+
+  it('allows saving alert config updates', async () => {
+    vi.mocked(calculatorApi.getAlertConfigs).mockResolvedValue([]);
+    vi.mocked(calculatorApi.saveAlertConfigs).mockResolvedValue({ alerts: [] });
+
+    render(<CalculatorPage />);
+
+    const alertsTab = screen.getByTestId('tab-alerts');
+    fireEvent.click(alertsTab);
+
+    await waitFor(() => {
+      expect(screen.getByText('Nutrition Target Alerts')).toBeInTheDocument();
+    });
+
+    // Toggle calories enabled
+    const caloriesEnabled = screen.getByTestId(
+      'calories-enabled',
+    ) as HTMLInputElement;
+    if (!caloriesEnabled.checked) {
+      fireEvent.click(caloriesEnabled);
+    }
+
+    // Change threshold
+    const calThresholdInput = screen.getByTestId(
+      'calories-threshold',
+    ) as HTMLInputElement;
+    fireEvent.change(calThresholdInput, { target: { value: '45' } });
+
+    // Submit
+    const submitBtn = screen.getByTestId('alerts-submit');
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(calculatorApi.saveAlertConfigs).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'calories',
+            thresholdPct: 45,
+            isEnabled: true,
+          }),
+        ]),
+      );
+    });
+
+    expect(
+      screen.getByText('Settings saved successfully!'),
+    ).toBeInTheDocument();
   });
 });
