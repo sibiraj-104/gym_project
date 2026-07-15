@@ -664,6 +664,22 @@ export default function Dashboard() {
             🍽️ Meal Log
           </Link>
           <Link
+            to="/calculator"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#ffffff',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              fontSize: '0.85rem',
+              marginRight: '0.5rem',
+            }}
+          >
+            🧮 Calculators
+          </Link>
+          <Link
             to="/scanner"
             style={{
               background: 'linear-gradient(135deg, #c8ff00, #8bc34a)',

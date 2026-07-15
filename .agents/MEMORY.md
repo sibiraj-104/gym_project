@@ -50,13 +50,31 @@ All nutrition calculations live in `shared/src/utils/calculators.ts` to keep the
 - Docker compose setup for local services (MongoDB 7.0, Redis 7-alpine).
 - CI Pipeline (.github/workflows/ci.yml) with database services.
 
-### Milestone 2 — Auth & Dashboard (In Progress)
+### Milestone 2 — Auth & Dashboard (100% Completed)
 
 - **Issue #12 (Done)**: Google/Firebase backend token verification and user auto-creation.
 - **Issue #13 (Done)**: Backend email/password registration (`/register`) and login (`/login`) endpoints.
 - **Issue #14 (Done)**: Backend profile fetch (`GET /api/user/profile`) and onboarding submission (`PUT /api/user/onboarding`) endpoints.
 - **Issue #15 (Done)**: Frontend auth store (Zustand), Firebase client configs, ProtectedRoute component, and responsive Login UI page.
-- **Issue #16 (Current)**: Frontend 3-step onboarding wizard flow (`/onboarding`).
+- **Issue #16 (Done)**: Frontend 3-step onboarding wizard flow (`/onboarding`).
+- **Issue #17 (Done)**: User Dashboard UI redesign (Bento grid, calorie ring, macros, hydration).
+- **Issue #18 (Done)**: Playwright E2E tests for authentication, onboarding, and dashboard routing flows.
+
+### Milestone 3 — Food Tracking & Calculator (100% Completed)
+
+- **Issue #19 (Done)**: FoodItem + MealLog Mongoose models with unit tests.
+- **Issue #20 (Done)**: Backend food search and barcode lookup with Redis caching.
+- **Issue #21 (Done)**: Backend AI photo food scan route with rate limiting.
+- **Issue #22 (Done)**: Backend meal logging routes and controller with streak tracking.
+- **Issue #23 (Done)**: Frontend barcode + AI photo scan page.
+- **Issue #24 (Done)**: Frontend `/meals` page with food search, log, and daily totals.
+
+### Milestone 4 — Calculators & Alerts (In Progress)
+
+- **Issue #25 (Done)**: Core calculator logic, types, and validation schemas in shared package.
+- **Issue #26 (Done)**: Backend fitness calculator API routes and controller.
+- **Issue #27 (Done)**: Frontend `/calculator` page & tabbed UI.
+- **Issue #28 (Current)**: Backend nutrition alerts API & daily engine.
 
 ---
 

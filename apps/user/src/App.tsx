@@ -7,6 +7,7 @@ import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import ScannerPage from './pages/Scanner';
 import MealsPage from './pages/Meals';
+import CalculatorPage from './pages/Calculator';
 
 export default function App() {
   const { fetchProfile, isInitialized } = useAuthStore();
@@ -52,6 +53,14 @@ export default function App() {
           element={
             <ProtectedRoute requireOnboarded={true}>
               <MealsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calculator"
+          element={
+            <ProtectedRoute requireOnboarded={true}>
+              <CalculatorPage />
             </ProtectedRoute>
           }
         />
