@@ -69,12 +69,18 @@ All nutrition calculations live in `shared/src/utils/calculators.ts` to keep the
 - **Issue #23 (Done)**: Frontend barcode + AI photo scan page.
 - **Issue #24 (Done)**: Frontend `/meals` page with food search, log, and daily totals.
 
-### Milestone 4 — Calculators & Alerts (In Progress)
+### Milestone 4 — Calculators & Alerts (100% Completed)
 
 - **Issue #25 (Done)**: Core calculator logic, types, and validation schemas in shared package.
 - **Issue #26 (Done)**: Backend fitness calculator API routes and controller.
 - **Issue #27 (Done)**: Frontend `/calculator` page & tabbed UI.
-- **Issue #28 (Current)**: Backend nutrition alerts API & daily engine.
+- **Issue #28 (Done)**: Backend nutrition alerts API & daily engine.
+- **Issue #29 (Done)**: Frontend alert configurations settings tab.
+
+### Milestone 5 — Workout Tracker & PWA (In Progress)
+
+- **Issue #30 (Done)**: Workout database models and exercise seeder.
+- **Issue #31 (Current)**: Backend workout and exercise API routes & controllers.
 
 ---
 
