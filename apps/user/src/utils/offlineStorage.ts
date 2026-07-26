@@ -89,9 +89,8 @@ export function clearOfflineWorkoutsQueue(): void {
 
 /** Sync offline queued workouts with backend API */
 export async function syncOfflineWorkouts(
-  logWorkoutFn: (
-    data: Record<string, unknown>,
-  ) => Promise<{ workoutLog: IWorkoutLog }>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  logWorkoutFn: (data: any) => Promise<{ workoutLog: IWorkoutLog }>,
 ): Promise<{ syncedCount: number; errors: number }> {
   const queue = getOfflineWorkoutsQueue();
   if (queue.length === 0) {
