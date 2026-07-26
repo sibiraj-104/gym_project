@@ -3,7 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import WorkoutPage from './Workout';
 import { workoutApi } from '../api/workoutApi';
 import { useWorkoutStore } from '../store/workoutStore';
-import { MuscleGroup, Equipment } from 'gymfuel-shared';
+import {
+  MuscleGroup,
+  Equipment,
+  DifficultyLevel,
+  IExercise,
+  IWorkoutTemplate,
+  IWorkoutLog,
+} from 'gymfuel-shared';
 
 // Mock workoutApi
 vi.mock('../api/workoutApi', () => ({
@@ -24,33 +31,37 @@ vi.mock('react-router-dom', () => ({
 }));
 
 describe('WorkoutPage Component', () => {
-  const mockExercises = [
+  const mockExercises: IExercise[] = [
     {
       _id: 'ex-1',
       name: 'Bench Press',
       muscleGroup: MuscleGroup.CHEST,
       equipment: Equipment.BARBELL,
-      category: 'Strength',
-      description: 'Barbell bench press',
-      videoUrl: '',
+      difficulty: DifficultyLevel.INTERMEDIATE,
+      instructions: ['Lie on bench', 'Lower bar to chest', 'Press up'],
+      isCustom: false,
+      createdAt: '2026-07-01',
     },
     {
       _id: 'ex-2',
       name: 'Barbell Squat',
-      muscleGroup: MuscleGroup.LEGS,
+      muscleGroup: MuscleGroup.QUADS,
       equipment: Equipment.BARBELL,
-      category: 'Strength',
-      description: 'Back squat',
-      videoUrl: '',
+      difficulty: DifficultyLevel.INTERMEDIATE,
+      instructions: ['Bar on traps', 'Squat down', 'Drive up'],
+      isCustom: false,
+      createdAt: '2026-07-01',
     },
   ];
 
-  const mockTemplates = [
+  const mockTemplates: IWorkoutTemplate[] = [
     {
       _id: 'tmpl-1',
       name: 'Push Day Alpha',
       description: 'Chest, shoulders, triceps heavy strength',
-      difficulty: 'Intermediate' as const,
+      difficulty: DifficultyLevel.INTERMEDIATE,
+      durationWeeks: 4,
+      daysPerWeek: 3,
       targetMuscles: [MuscleGroup.CHEST, MuscleGroup.SHOULDERS],
       exercises: [
         {
@@ -62,11 +73,13 @@ describe('WorkoutPage Component', () => {
           notes: 'Focus on chest contraction',
         },
       ],
-      createdByAdmin: true,
+      createdByAdminId: 'admin-1',
+      isPublished: true,
+      createdAt: '2026-07-01',
     },
   ];
 
-  const mockHistory = [
+  const mockHistory: IWorkoutLog[] = [
     {
       _id: 'log-1',
       userId: 'user-123',
