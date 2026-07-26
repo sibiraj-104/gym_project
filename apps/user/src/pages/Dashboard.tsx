@@ -680,6 +680,22 @@ export default function Dashboard() {
             🧮 Calculators
           </Link>
           <Link
+            to="/workout"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#ffffff',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              fontSize: '0.85rem',
+              marginRight: '0.5rem',
+            }}
+          >
+            🏋️ Workouts
+          </Link>
+          <Link
             to="/scanner"
             style={{
               background: 'linear-gradient(135deg, #c8ff00, #8bc34a)',
@@ -832,6 +848,17 @@ export default function Dashboard() {
           >
             <button className="dash-cta-btn" onClick={() => setShowModal(true)}>
               <span>⚡</span> Log Today's Fuel
+            </button>
+            <button
+              className="dash-cta-btn"
+              onClick={() => navigate('/workout')}
+              style={{
+                background: 'linear-gradient(135deg, #a855f7, #6366f1)',
+                boxShadow: '0 6px 22px rgba(168, 85, 247, 0.32)',
+                color: '#ffffff',
+              }}
+            >
+              <span>🏋️</span> Start Workout
             </button>
             <div className="dash-stats-pills">
               <div className="dash-stat-pill">
