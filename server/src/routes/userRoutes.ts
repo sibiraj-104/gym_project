@@ -3,14 +3,14 @@ import {
   getUserProfile,
   updateOnboarding,
 } from '../controllers/userController';
-import { authMiddleware } from '../middleware/auth';
+import { authenticateUser } from '../middleware/auth';
 
 const router = Router();
 
 // GET /api/user/profile - Get profile details (authenticated)
-router.get('/profile', authMiddleware, getUserProfile);
+router.get('/profile', authenticateUser, getUserProfile);
 
 // PUT /api/user/onboarding - Complete onboarding stats & goal setup (authenticated)
-router.put('/onboarding', authMiddleware, updateOnboarding);
+router.put('/onboarding', authenticateUser, updateOnboarding);
 
 export default router;

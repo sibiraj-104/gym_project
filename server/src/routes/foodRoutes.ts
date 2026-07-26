@@ -5,7 +5,7 @@
 // ============================================================
 
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth';
+import { authenticateUser } from '../middleware/auth';
 import {
   searchFood,
   lookupBarcode,
@@ -16,7 +16,7 @@ import { uploadSingleImage } from '../middleware/upload';
 const router = Router();
 
 // Protect all routes under /api/food
-router.use(authMiddleware);
+router.use(authenticateUser);
 
 // GET /api/food/search?q=banana&page=1&limit=10
 router.get('/search', searchFood);

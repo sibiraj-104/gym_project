@@ -5,7 +5,7 @@
 // ============================================================
 
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth';
+import { authenticateUser } from '../middleware/auth';
 import {
   logMeal,
   getTodayLog,
@@ -16,7 +16,7 @@ import {
 const router = Router();
 
 // Protect all routes under /api/meals
-router.use(authMiddleware);
+router.use(authenticateUser);
 
 // POST /api/meals/log
 router.post('/log', logMeal);

@@ -52,6 +52,8 @@ export function authMiddleware(
   }
 }
 
+export const authenticateUser = authMiddleware;
+
 // ── Optional Auth Middleware ──────────────────────────────────
 
 /**

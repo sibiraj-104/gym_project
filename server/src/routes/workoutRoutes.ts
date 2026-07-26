@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth';
+import { authenticateUser } from '../middleware/auth';
 import {
   getExercises,
   getExerciseById,
@@ -12,7 +12,7 @@ import {
 const router = Router();
 
 // Apply auth middleware to protect all workout tracker endpoints
-router.use(authMiddleware);
+router.use(authenticateUser);
 
 // Exercise endpoints
 router.get('/exercises', getExercises);

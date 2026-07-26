@@ -49,5 +49,9 @@ if (process.env.NODE_ENV === 'test') {
   });
 }
 
+export function getRedisClient(): Redis {
+  return redis;
+}
+
 export { redis };
 export default redis;

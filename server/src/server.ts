@@ -17,6 +17,7 @@ import mealRoutes from './routes/mealRoutes';
 import calculatorRoutes from './routes/calculatorRoutes';
 import alertRoutes from './routes/alertRoutes';
 import workoutRoutes from './routes/workoutRoutes';
+import aiRoutes from './routes/aiRoutes';
 
 const app = express();
 
@@ -50,6 +51,9 @@ app.use('/api/nutrition', alertRoutes);
 
 // 🏋️ Workout & Exercise Tracking Routes
 app.use('/api/workout', workoutRoutes);
+
+// 🤖 AI Fitness Coach & Chat Routes
+app.use('/api/ai', aiRoutes);
 
 // 🟢 Health check endpoint
 app.get('/api/system/health', (_req: Request, res: Response) => {
