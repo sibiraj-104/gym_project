@@ -1,0 +1,66 @@
+name: Autonomous Cloud AI Issue Resolver
+
+on:
+  issues:
+    types: [labeled, assigned]
+
+jobs:
+  resolve-issue:
+    if: contains(github.event.issue.labels.*.name, 'ai-build') || github.event.assignee.login == 'sibiraj-104'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm 11
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build Shared Package
+        run: pnpm --filter gymfuel-shared run build
+
+      - name: Comment on Issue Triggered
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "🤖 **Cloud AI Agent Triggered!**\n\nThe Cloud AI Agent has started processing this issue. It will implement the requested changes, run monorepo typechecks & unit tests, and submit an automated Pull Request shorty."
+            })
+
+      - name: Verify Monorepo Build & Typecheck
+        run: |
+          pnpm run typecheck:all
+          pnpm run lint:all
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'feat(ai): resolve issue #${{ github.event.issue.number }} via Cloud AI Agent'
+          branch: 'ai/issue-${{ github.event.issue.number }}'
+          title: '🤖 AI Resolution for #${{ github.event.issue.number }}: ${{ github.event.issue.title }}'
+          body: |
+            ## 🤖 Automated Cloud AI Agent Pull Request
+            This PR automatically implements and resolves **Issue #${{ github.event.issue.number }}**.
+
+            Closes #${{ github.event.issue.number }}
+          labels: 'ai-generated, ready-for-review'
