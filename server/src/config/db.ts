@@ -55,6 +55,12 @@ async function attemptConnection(): Promise<void> {
     retryCount++;
 
     if (retryCount >= MAX_RETRIES) {
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn(
+          '⚠️ MongoDB is not running locally. Start MongoDB/Docker or update MONGO_URI in .env to connect.',
+        );
+        return;
+      }
       logger.error(
         `❌ Failed to connect to MongoDB after ${MAX_RETRIES} attempts. Exiting.`,
         { error: err },

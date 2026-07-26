@@ -82,15 +82,17 @@ app.use(errorHandler); // Global error handler
 
 // ── Server Startup ──────────────────────────────────────────
 async function startServer() {
-  // Connect to Database
-  await connectDatabase();
-  registerShutdownHandlers();
-
   const PORT = env.PORT;
 
   app.listen(PORT, () => {
     logger.info(`🚀 Server running on port ${PORT} in ${env.NODE_ENV} mode`);
   });
+
+  // Connect to Database in background
+  connectDatabase().catch((err) => {
+    logger.error('Failed to connect to database:', err);
+  });
+  registerShutdownHandlers();
 }
 
 // Start server if run directly

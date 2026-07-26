@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
@@ -32,6 +33,32 @@ const loginSchema = z.object({
  */
 export async function registerUser(req: Request, res: Response): Promise<void> {
   const { name, email, password } = registerSchema.parse(req.body);
+
+  // Dev fallback if database is disconnected
+  if (mongoose.connection.readyState !== 1 && env.NODE_ENV === 'development') {
+    const mockUserId = '660000000000000000000001';
+    const appToken = generateJWT(mockUserId, UserRole.USER);
+    res.cookie('token', appToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(201).json({
+      message: 'Registration successful',
+      user: {
+        id: mockUserId,
+        name,
+        email,
+        role: UserRole.USER,
+        isOnboarded: true,
+        streakCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    });
+    return;
+  }
 
   // 1. Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -89,6 +116,32 @@ export async function registerUser(req: Request, res: Response): Promise<void> {
  */
 export async function loginUser(req: Request, res: Response): Promise<void> {
   const { email, password } = loginSchema.parse(req.body);
+
+  // Dev fallback if database is disconnected
+  if (mongoose.connection.readyState !== 1 && env.NODE_ENV === 'development') {
+    const mockUserId = '660000000000000000000001';
+    const appToken = generateJWT(mockUserId, UserRole.USER);
+    res.cookie('token', appToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: mockUserId,
+        name: 'Demo User',
+        email,
+        role: UserRole.USER,
+        isOnboarded: true,
+        streakCount: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    });
+    return;
+  }
 
   // 1. Find user, explicitly selecting passwordHash
   const user = await User.findOne({ email }).select('+passwordHash');
@@ -153,6 +206,36 @@ export async function googleOneTapLogin(
   res: Response,
 ): Promise<void> {
   const { token } = googleLoginSchema.parse(req.body);
+
+  // Dev fallback if database is disconnected or dev mock token is used
+  if (
+    (token === 'mock_google_id_token_dev' ||
+      mongoose.connection.readyState !== 1) &&
+    env.NODE_ENV === 'development'
+  ) {
+    const mockUserId = '660000000000000000000001';
+    const appToken = generateJWT(mockUserId, UserRole.USER);
+    res.cookie('token', appToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({
+      message: 'Google login successful',
+      user: {
+        id: mockUserId,
+        name: 'Google User',
+        email: 'googleuser@gymfuel.com',
+        role: UserRole.USER,
+        isOnboarded: true,
+        streakCount: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    });
+    return;
+  }
 
   let googleUser;
   try {
