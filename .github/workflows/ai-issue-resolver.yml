@@ -43,8 +43,16 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "🤖 **Cloud AI Agent Triggered!**\n\nThe Cloud AI Agent has started processing this issue. It will implement the requested changes, run monorepo typechecks & unit tests, and submit an automated Pull Request shorty."
+              body: "🤖 **Cloud AI Agent Triggered!**\n\nThe Cloud AI Agent has started processing this issue. It will implement the requested changes, run monorepo typechecks & unit tests, and submit an automated Pull Request shortly."
             })
+
+      - name: Execute Gemini Cloud AI Code Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: node .github/scripts/ai-generator.js
 
       - name: Verify Monorepo Build & Typecheck
         run: |
