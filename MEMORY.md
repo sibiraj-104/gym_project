@@ -77,12 +77,13 @@ All nutrition calculations live in `shared/src/utils/calculators.ts` to keep the
 - **Issue #28 (Done)**: Backend nutrition alerts API & daily engine.
 - **Issue #29 (Done)**: Frontend alert configurations settings tab.
 
-### Milestone 5 — Workout Tracker & PWA (In Progress)
+### Milestone 5 — Workout Tracker & PWA (100% Completed & Released v5.0.0)
 
 - **Issue #30 (Done)**: Workout database models and exercise seeder.
 - **Issue #31 (Done)**: Backend workout and exercise API routes & controllers.
 - **Issue #32 (Done)**: Frontend Workout Tracker page & unit test suite.
-- **Issue #33 (Current)**: PWA integration, service worker setup & offline exercise caching.
+- **Issue #33 (Done)**: PWA integration, service worker setup & offline exercise caching.
+- **Release v5.0.0 (Published)**: Tagged `v5.0.0` on GitHub with complete release notes.
 
 ---
 
