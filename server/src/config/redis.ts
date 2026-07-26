@@ -25,12 +25,27 @@ if (process.env.NODE_ENV === 'test') {
     },
   });
 
+  let mockActive = false;
   redis.on('connect', () => {
     logger.info('✅ Redis connected successfully.');
   });
 
   redis.on('error', (err) => {
-    logger.error('❌ Redis connection error:', err);
+    if (!mockActive && process.env.NODE_ENV === 'development') {
+      logger.warn(
+        '⚠️  Redis unavailable locally — switching to in-memory Redis mock.',
+      );
+      mockActive = true;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const RedisMock = require('ioredis-mock');
+        redis = new RedisMock();
+      } catch {
+        // ignore
+      }
+    } else if (!mockActive) {
+      logger.error('❌ Redis connection error:', err);
+    }
   });
 }
 

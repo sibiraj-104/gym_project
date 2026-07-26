@@ -1,10 +1,13 @@
 import type { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { User } from '../models/User';
 import { Errors } from '../middleware/errorHandler';
+import { env } from '../config/env';
 import {
   onboardingSchema,
   calculateTDEE,
   calculateMacroTargets,
+  UserRole,
 } from 'gymfuel-shared';
 
 /**
@@ -18,6 +21,23 @@ export async function getUserProfile(
 ): Promise<void> {
   if (!req.user) {
     throw Errors.unauthorized('Authentication required.');
+  }
+
+  // Dev fallback if database is disconnected
+  if (mongoose.connection.readyState !== 1 && env.NODE_ENV === 'development') {
+    res.status(200).json({
+      user: {
+        id: req.user.userId || '660000000000000000000001',
+        name: 'Demo User',
+        email: 'demo@gymfuel.com',
+        role: UserRole.USER,
+        isOnboarded: true,
+        streakCount: 5,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    });
+    return;
   }
 
   const user = await User.findById(req.user.userId);

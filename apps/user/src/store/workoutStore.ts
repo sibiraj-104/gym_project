@@ -176,17 +176,52 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
 
     set({ loading: true, error: null });
 
-    try {
-      const payload = {
-        name: activeWorkout.name,
-        exercises: activeWorkout.exercises,
-        durationMinutes,
-        caloriesBurned,
-        notes,
-        startedAt: activeWorkout.startedAt,
-        completedAt: new Date().toISOString(),
+    // Calculate total volume locally
+    let totalVolume = 0;
+    activeWorkout.exercises.forEach((ex) => {
+      ex.sets.forEach((s) => {
+        if (!s.isWarmup) {
+          totalVolume += (s.weight || 0) * (s.reps || 0);
+        }
+      });
+    });
+
+    const payload = {
+      name: activeWorkout.name,
+      exercises: activeWorkout.exercises,
+      durationMinutes,
+      totalVolume,
+      caloriesBurned,
+      notes,
+      startedAt: activeWorkout.startedAt,
+      completedAt: new Date().toISOString(),
+    };
+
+    // Check if browser is offline
+    if (typeof window !== 'undefined' && !window.navigator.onLine) {
+      // Import dynamically or use helper
+      const { enqueueOfflineWorkout } = await import('../utils/offlineStorage');
+      const offlineItem = enqueueOfflineWorkout(payload);
+
+      const mockLog: IWorkoutLog = {
+        _id: offlineItem.id,
+        userId: 'offline-user',
+        name: payload.name,
+        exercises: payload.exercises,
+        durationMinutes: payload.durationMinutes,
+        totalVolume: payload.totalVolume,
+        caloriesBurned: payload.caloriesBurned,
+        notes: payload.notes,
+        startedAt: payload.startedAt,
+        completedAt: payload.completedAt,
+        createdAt: offlineItem.queuedAt,
       };
 
+      set({ activeWorkout: initialActiveWorkout, loading: false });
+      return mockLog;
+    }
+
+    try {
       const res = await workoutApi.logWorkout(payload);
       set({ activeWorkout: initialActiveWorkout, loading: false });
       return res.workoutLog;
